@@ -12,14 +12,17 @@ public class PlayerScript : MonoBehaviour
     private const float MoveSpeed = 0.01f;
     private const float JumpPower = 0.017f;
 
-    private bool isCanTakeDamage = true;
-    private const float InvulTime = 2f;
-
+    private bool isCanTakeDamage = true;           
+    private const float InvulTime = 1f;            //how long main hero is can't be toched
+    private const float InvulAnimationTime = 0.2f; //how often main hero is blblinking
+    //Main hero's rigibody
+    //using for moving him
     private Rigidbody2D rb;
 
 
     void Start()
     {
+
         rb = GetComponent<Rigidbody2D>();
     }
 
@@ -30,16 +33,27 @@ public class PlayerScript : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.gameObject.GetComponent<ObjectInfo>().IsDealDamage == true && isCanTakeDamage)
+        // If main hero is triggering with the objects 
+        //with IsDealDamage = true fields 
+        //and it is not invuled
+        try
         {
-            GetTheInvul();
-            GetDamage(collision);
+            if (collision.gameObject.GetComponent<ObjectInfo>().IsDealDamage == true && isCanTakeDamage)
+            {
+                GetTheInvul(); // Our hero is invuled for InvulTime now
+                GetDamage(collision); //Lose an HP
+            }
+        }
+        catch (System.NullReferenceException ex)
+        {
+            //ex code here
         }
     }
 
     private void GetTheInvul()
     {
-        StartCoroutine(InvulThePlayer());
+        StartCoroutine(InvulThePlayerAnimation());
+        StartCoroutine(InvulThePlayer()); 
     }
 
     IEnumerator InvulThePlayer()
@@ -48,8 +62,16 @@ public class PlayerScript : MonoBehaviour
         isCanTakeDamage = true;
     }
 
-
-
+    IEnumerator InvulThePlayerAnimation()
+    {
+        for (int x = 0; x < 5; x++)
+        {
+            GetComponent<SpriteRenderer>().enabled = !GetComponent<SpriteRenderer>().enabled;
+            yield return new WaitForSeconds(InvulAnimationTime);
+        }
+        GetComponent<SpriteRenderer>().enabled = true;
+    }
+    
     private void MoveInput()
     {
 #if (FirstVersion)
@@ -103,13 +125,12 @@ public class PlayerScript : MonoBehaviour
 
     private IEnumerator DestroyTheLife(int lifeNumber, Collider2D coll)
     {
-        Debug.Log(lifeNumber);
         float fillAmount = GameObject.Find("Canvas/Health (" + lifeNumber + ")").GetComponent<Image>().fillAmount;
 
         if (fillAmount > 0)
         {
             GameObject.Find("Canvas/Health (" + lifeNumber + ")").GetComponent<Image>().fillAmount -= 0.01f;
-            yield return new WaitForSeconds(0.02f);
+            yield return new WaitForSeconds(0.01f);
             StartCoroutine(DestroyTheLife(lifes, coll));
             yield break;
         }
@@ -117,9 +138,7 @@ public class PlayerScript : MonoBehaviour
         {
             lifes--;
         }
-
     }
-
 
 
 }

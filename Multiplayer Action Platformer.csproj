@@ -81,14 +81,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\BalloonScrip.cs" />
+    <Compile Include="Assets\Scripts\BalloonSpawner.cs" />
     <Compile Include="Assets\Scripts\CameraScript.cs" />
-    <Compile Include="Assets\Scripts\Interfaces.cs" />
-    <Compile Include="Assets\Scripts\MenuScript.cs" />
+    <Compile Include="Assets\Scripts\GameStatus.cs" />
+    <Compile Include="Assets\Scripts\Heroes\PlayerScript.cs" />
+    <Compile Include="Assets\Scripts\Intefaces.cs" />
+    <Compile Include="Assets\Scripts\NextLevelScript.cs" />
     <Compile Include="Assets\Scripts\ObjectInfo.cs" />
-    <Compile Include="Assets\Scripts\PlayerScript.cs" />
-    <Compile Include="Assets\Scripts\UiScript.cs" />
-    <Compile Include="Assets\Scripts\UpBorder.cs" />
+    <Compile Include="Assets\Scripts\Objects\Agro\BalloonScrip.cs" />
+    <Compile Include="Assets\Scripts\Objects\Agro\CastleScript.cs" />
+    <Compile Include="Assets\Scripts\Objects\Agro\HouseScript.cs" />
+    <Compile Include="Assets\Scripts\Objects\Agro\LampScript.cs" />
+    <Compile Include="Assets\Scripts\Objects\Agro\RoadScript.cs" />
+    <Compile Include="Assets\Scripts\Objects\Agro\TreeScript.cs" />
+    <Compile Include="Assets\Scripts\Objects\Agro\UpBorder.cs" />
+    <Compile Include="Assets\Scripts\Ui and Menu\MenuScript.cs" />
+    <Compile Include="Assets\Scripts\Ui and Menu\ScorePanelScript.cs" />
+    <Compile Include="Assets\Scripts\Ui and Menu\UiScript.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
