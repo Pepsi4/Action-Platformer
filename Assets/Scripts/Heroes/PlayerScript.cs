@@ -12,7 +12,13 @@ public class PlayerScript : MonoBehaviour
     private const float MoveSpeed = 0.01f;
     private const float JumpPower = 0.017f;
 
-    private bool isCanTakeDamage = true;           
+    private static bool isCanTakeDamage = true;
+    public static bool IsCanTakeDamage
+    {
+        get { return isCanTakeDamage; }
+        set { isCanTakeDamage = value; }
+    }
+               
     private const float InvulTime = 1f;            //how long main hero is can't be toched
     private const float InvulAnimationTime = 0.2f; //how often main hero is blblinking
     //Main hero's rigibody

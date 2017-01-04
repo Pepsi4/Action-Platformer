@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine.UI;
+﻿using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -12,13 +11,10 @@ public class MenuScript : MonoBehaviour {
 	    GameObject buttonExit = GameObject.Find("Canvas/Exit");
 
 	    buttonStartTheGame.GetComponent<Button>().onClick.AddListener(StartTheGame);
-
-    
 	}
 
     void StartTheGame()
     {
-        //Application.LoadLevel("SinglePlayer");
         SceneManager.LoadScene("SinglePlayer");
     }
 	

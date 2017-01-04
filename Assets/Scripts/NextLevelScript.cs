@@ -3,6 +3,17 @@ using UnityEngine.UI;
 
 public class NextLevelScript : MonoBehaviour
 {
+    //The easiest way is using constructor.
+    //Coz the method is not static : TODO
+    ScorePanelScript scorePanel;
+    //constructor
+    private void Start()
+    {
+        scorePanel = GameObject.Find("Canvas/ScorePanel").GetComponent<ScorePanelScript>();
+    }
+
+
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.name == "MainHero")
@@ -22,13 +33,24 @@ public class NextLevelScript : MonoBehaviour
 
         //pause the game
         Pause();
+        //show the stars
+        scorePanel.ShowStar();
     }
+    
 
+
+    //We have to pause the game sometimes.
+    //For ex: the level finished by player.
     public static void Pause()
     {
         //time counter frozen
         //Stops spawning the balloons
         GameStatus.IsActive = false;
+
+        //The hero should be invulnerable.
+        PlayerScript.IsCanTakeDamage = false;
+        //freez the main hero
+        GameObject.Find("MainHero").GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeAll;
 
         //balloons frozen
         GameObject[] movingObjects = GameObject.FindGameObjectsWithTag("Moving");
@@ -37,4 +59,5 @@ public class NextLevelScript : MonoBehaviour
             obj.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePositionY;
         }
     }
+
 }
