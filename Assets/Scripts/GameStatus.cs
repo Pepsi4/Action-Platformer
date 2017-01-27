@@ -1,93 +1,202 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class GameStatus : MonoBehaviour
 {
+    /// <summary>
+    /// Stops the game. Shows the after game UI.
+    /// </summary>
+    public static void StopTheGame()
+    {
+        //UI part
+        //starts the animation
+        GameObject.Find("Canvas/ScorePanel").GetComponent<Animator>().Play("ScorePanel");
+        //updating text
+        GameObject.Find("Canvas/ScorePanel/ScoreText").GetComponent<Text>().text = "Your time: " + GameStatus.TimeActive.ToString("0.##");
+
+        //pause the game
+        GameStatus.Pause();
+        //show the stars
+        GameObject.Find("Canvas/ScorePanel").GetComponent<ScorePanelScript>().ShowStar();
+    }
+
+
+
+    //We have to pause the game sometimes.
+    //For ex: the level finished by player.
+    /// <summary>
+    /// Freezing gameobjects. Stops hero and ballooon spawning. Makes game`s IsActive disabled.
+    /// </summary>
+    public static void Pause()
+    {
+        //time counter frozen
+        //Stops spawning the balloons
+        GameStatus.IsActive = false;
+
+        //The hero should be invulnerable.
+        PlayerScript.IsCanTakeDamage = false;
+        //freez the main hero
+        GameObject.Find("MainHero").GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeAll;
+
+        //balloons frozen
+        GameObject[] movingObjects = GameObject.FindGameObjectsWithTag("Moving");
+        foreach (GameObject obj in movingObjects)
+        {
+            obj.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePositionY;
+        }
+    }
+
+    /// <summary>
+    /// Makes game active; hero can take dmg; unfreezing balloons and main hero
+    /// </summary>
+    public static void UnPause()
+    {
+        //sets game as active again
+        IsActive = true;
+
+        //player can take dmg again 
+        PlayerScript.IsCanTakeDamage = true;
+
+        //unfreezing main hero
+        //GameObject.Find("MainHero").GetComponent<Rigidbody2D>().constraints = 0;
+
+        //unfreezing balloons
+        GameObject[] movingObjects = GameObject.FindGameObjectsWithTag("Moving");
+
+        foreach (GameObject obj in movingObjects)
+        {
+            obj.GetComponent<Rigidbody2D>().constraints = 0;
+        }
+    }
+
+
     //is game active
     private static bool isActive = true;
+    /// <summary>
+    /// Boolian shows us: if the game is active or not.
+    /// </summary>
     public static bool IsActive
     {
         get { return isActive; }
         set { isActive = value; }
     }
 
+    private void Update()
+    {
+        if (isActive)
+        {
+            TimeActive += (Time.deltaTime);
+        }
+    }
+
+    /// <summary>
+    /// how long the level is playing
+    /// </summary>
     public static float TimeActive { get; set; }
 
-    private static int level = 1;
-    public static int Level
+
+    private static int currentLevel = 1;
+    //the current level
+    public static int CurrentLevel
     {
-        get { return level; }
-        set { level = value; }
+        get { return currentLevel; }
+        set { currentLevel = value; }
     }
+
+    //array is contains bool values - if we passed the level already
+    public static bool[] IsLevelPassed = new bool[3];
 
     public class GameScore
     {
-        //Every level class should to have static public method 'GetLevelScore()'.
 
-        //first level
+
+        //first level info
         public class FirstLevel
         {
-            private const float HightScore = 5f;
-            private const float MiddleScore = 7f;
-            private const float LowScore = 9f;
+            internal const float HightScore = 7f;
+            internal const float MiddleScore = 11f;
+            internal const float LowScore = 15f;
 
-            public static int GetLevelScore()
-            {
-               return GetScore(HightScore, MiddleScore, LowScore);
-            }
+            internal static int bestResult = 0;
         }
-        
-        //second level
+
+        //second level info
         public class SecondLevel
         {
-            private const float HightScore = 5f;
-            private const float MiddleScore = 7f;
-            private const float LowScore = 9f;
+            internal const float HightScore = 5f;
+            internal const float MiddleScore = 7f;
+            internal const float LowScore = 9f;
 
-            public static int GetLevelScore()
+            internal static int bestResult = 0;
+        }
+
+        internal enum Score : int
+        {
+            HightScore = 3,
+            MiddleScore = 2,
+            LowScore = 1,
+            Nothing = 0
+        }
+
+        //todo: use generic
+
+        /// <summary>
+        /// Sets the best result for current level.
+        /// </summary>
+        /// <param name="score">the score from 0 - 3</param>
+        public static void SetTheBestResult(int score)
+        {
+            switch (currentLevel)
             {
-               return GetScore(HightScore, MiddleScore, LowScore);
+                case 1:
+                    if (FirstLevel.bestResult < score) FirstLevel.bestResult = score;
+                    break;
+
+                case 2:
+                    if (SecondLevel.bestResult < score) SecondLevel.bestResult = score;
+                    break;
             }
         }
 
-        /// <returns>3-the best,2-middle,1-low,0-nothing</returns>
-        public static int GetLevelScoreByCurrnentLevel()
+        /// <summary>
+        /// Returns score for the variable current level. 
+        /// Workout with data in classes as FirstLevel, SecondLevel etc. 
+        /// </summary>
+        /// <returns>
+        /// 3-the best,2-middle,1-low,0-nothing
+        /// </returns>
+        internal static int GetScoreForCurrentLevel()
         {
-            switch (level)
+            switch (CurrentLevel)
             {
                 case 1:
-                   return FirstLevel.GetLevelScore();
+                    return GetScore(FirstLevel.HightScore, FirstLevel.MiddleScore, FirstLevel.LowScore);
                 case 2:
-                    return SecondLevel.GetLevelScore();
+                    return GetScore(SecondLevel.HightScore, SecondLevel.MiddleScore, SecondLevel.LowScore);
             }
             return 0;
         }
 
+
         /// <returns>3-the best,2-middle,1-low,0-nothing</returns>
         private static int GetScore(float hight, float middle, float low)
         {
-            int score = 0;
-
             if (TimeActive < hight)
             {
-                score = 3;
-                return score;
+                return (int)Score.HightScore;
             }
             else if (TimeActive < middle)
             {
-                score = 2;
-                return score;
+                return (int)Score.MiddleScore;
             }
             else if (TimeActive < low)
             {
-                score = 1;
-                return score;
+                return (int)Score.LowScore;
             }
-            else //if the score is lower, than low score.
+            else //if the score is lower, than the low score.
             {
-                score = 0;
-                return score;
+                return (int)Score.Nothing;
             }
         }
     }
-
 }

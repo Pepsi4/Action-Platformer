@@ -7,19 +7,41 @@ using UnityEngine.UI;
 
 public class PlayerScript : MonoBehaviour
 {
+    
+    private static int lifesMax = 3;
+    /// <summary>
+    /// Max value of hero's HP
+    /// </summary>
+    public static int LifesMax
+    {
+        get { return lifesMax; }
+        set { lifesMax = value; }
+    }
+
     private static int lifes = 3;
+    /// <summary>
+    /// Current count of hero's HP
+    /// </summary>
+    public static int Lifes
+    {
+        get { return lifes; }
+        set { lifes = value; }
+    }
 
     private const float MoveSpeed = 0.01f;
     private const float JumpPower = 0.017f;
 
     private static bool isCanTakeDamage = true;
+    /// <summary>
+    /// If it's sets true, the hero can't take any damage.
+    /// </summary>
     public static bool IsCanTakeDamage
     {
         get { return isCanTakeDamage; }
         set { isCanTakeDamage = value; }
     }
                
-    private const float InvulTime = 1f;            //how long main hero is can't be toched
+    private const float InvulTime = 1f;            //how long main hero is can't be touched
     private const float InvulAnimationTime = 0.2f; //how often main hero is blblinking
     //Main hero's rigibody
     //using for moving him
@@ -28,7 +50,6 @@ public class PlayerScript : MonoBehaviour
 
     void Start()
     {
-
         rb = GetComponent<Rigidbody2D>();
     }
 
@@ -41,13 +62,15 @@ public class PlayerScript : MonoBehaviour
     {
         // If main hero is triggering with the objects 
         //with IsDealDamage = true fields 
-        //and it is not invuled
+        //and hero is not invuled
         try
         {
             if (collision.gameObject.GetComponent<ObjectInfo>().IsDealDamage == true && isCanTakeDamage)
             {
-                GetTheInvul(); // Our hero is invuled for InvulTime now
-                GetDamage(collision); //Lose an HP
+                if (IsHealthLow()) return;          //return from the function if the health are <= 0
+                GetTheInvul();                      // Our hero is invuled for InvulTime now
+                GetDamage(collision);               //Lose an HP.
+                if (IsHealthLow()) EndTheGame();    //If our hp is = 0 now.
             }
         }
         catch (System.NullReferenceException ex)
@@ -55,6 +78,21 @@ public class PlayerScript : MonoBehaviour
             //ex code here
         }
     }
+
+    private void EndTheGame()
+    {
+        
+    }
+
+    private bool IsHealthLow()
+    {
+        if (lifes <= 0)
+        {
+            return true;
+        }
+        return false;
+    }
+
 
     private void GetTheInvul()
     {

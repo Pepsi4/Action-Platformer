@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
-public class ScorePanelScript : MonoBehaviour {
+public class ScorePanelScript : MonoBehaviour
+{
 
+    //Button which should send us to the SelectScene.
+    GameObject nextLevelButton;
     //contaits 3 stars
     GameObject[] star;
     //
@@ -14,7 +18,7 @@ public class ScorePanelScript : MonoBehaviour {
     {
         GameObject.Find("Canvas/ScorePanel").GetComponent<Animator>().Stop();
     }
-    
+
 
     private void Start()
     {
@@ -22,9 +26,20 @@ public class ScorePanelScript : MonoBehaviour {
         star = new GameObject[4];
 
         //1,2,3 coz 0 is returenable value from method GetLevelScore().
-        star[1]  = GameObject.Find("Canvas/ScorePanel/Star (1)");
+        star[1] = GameObject.Find("Canvas/ScorePanel/Star (1)");
         star[2] = GameObject.Find("Canvas/ScorePanel/Star (2)");
         star[3] = GameObject.Find("Canvas/ScorePanel/Star (3)");
+
+        //find the button
+        nextLevelButton = GameObject.Find("Canvas/ScorePanel/NextLevel");
+        //
+        nextLevelButton.GetComponent<Button>().onClick.AddListener(GoToSelectMenu);
+        Debug.Log(nextLevelButton.GetComponent<Button>().enabled);
+    }
+
+    private void GoToSelectMenu()
+    {
+        SceneManager.LoadScene("SelectScene");
     }
 
     public void ShowStar()
@@ -34,37 +49,52 @@ public class ScorePanelScript : MonoBehaviour {
 
     private void ShowStarOneByOne()
     {
-        int score = GameStatus.GameScore.FirstLevel.GetLevelScore();
+        int score = GameStatus.GameScore.GetScoreForCurrentLevel();
         StartCoroutine(ShowStarProcessing(score));
     }
-    
 
-    IEnumerator ShowStarProcessing(int number)
+
+    private int currentStarNumber = 1;
+
+    IEnumerator ShowStarProcessing(int score)
     {
+        //if the user has 0 score points  ¯\_(ツ)_/¯ 
+        if (score == 0)
+        {
+            yield break;
+        }
+        
         //change the color of star
-        star[number].GetComponent<Image>().color = Color.Lerp(Color.white, Color.grey, unfoggingSpeed);
-        //using for smoothy color change
+        star[currentStarNumber].GetComponent<Image>().color = Color.Lerp(Color.white, Color.grey, unfoggingSpeed);
+        //using for smooth color change
         unfoggingSpeed -= 0.01f;
-        Debug.Log("Showing the star..." + number);
         //speed[2]
         yield return new WaitForSeconds(0.01f);
         //if the star changed color already
         if (unfoggingSpeed <= 0)
         {
+            //Gets reverse star number to our score.
+            //It needs for the order-showing stars.
+            if (currentStarNumber >= score + 1)
+            {
+                yield break;
+            }
+
+            currentStarNumber++;
+         
             //reset for next use
             unfoggingSpeed = 1;
             //if all stars are done
-            if (number != 0)
+            if (score != 0)
             {
                 //recursion
                 //for the next star
-                StartCoroutine(ShowStarProcessing(--number));
-                Debug.Log("Star Number: " + number);
+                StartCoroutine(ShowStarProcessing(--score));
             }
             yield break;
         }
         //recursion
         //for the current star
-        StartCoroutine(ShowStarProcessing(number));
+        StartCoroutine(ShowStarProcessing(score));
     }
 }

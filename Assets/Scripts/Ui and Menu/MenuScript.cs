@@ -15,7 +15,7 @@ public class MenuScript : MonoBehaviour {
 
     void StartTheGame()
     {
-        SceneManager.LoadScene("SinglePlayer");
+        SceneManager.LoadScene("SelectScene");
     }
 	
 	
