@@ -20,7 +20,11 @@ public class GameStatus : MonoBehaviour
         GameObject.Find("Canvas/ScorePanel").GetComponent<ScorePanelScript>().ShowStar();
     }
 
+    //todo
+    //public static int GetLevelsCount()
+    //{
 
+    //}
 
     //We have to pause the game sometimes.
     //For ex: the level finished by player.
@@ -69,6 +73,14 @@ public class GameStatus : MonoBehaviour
         }
     }
 
+    private static int levelsCount = 3;
+    /// <summary>
+    /// The current value of level's count.
+    /// </summary>
+    public static int LevelCount
+    {
+        get { return levelsCount; }
+    }
 
     //is game active
     private static bool isActive = true;
@@ -95,7 +107,7 @@ public class GameStatus : MonoBehaviour
     public static float TimeActive { get; set; }
 
 
-    private static int currentLevel = 1;
+    private static int currentLevel = 0;
     //the current level
     public static int CurrentLevel
     {
@@ -103,13 +115,23 @@ public class GameStatus : MonoBehaviour
         set { currentLevel = value; }
     }
 
-    //array is contains bool values - if we passed the level already
-    public static bool[] IsLevelPassed = new bool[3];
+    /// <summary>
+    /// Array is contains bool values - if we passed the level already. Lengh = static int levelsCount.
+    /// </summary>
+    public static bool[] IsLevelPassed = new bool[levelsCount];
+
+    public static int GetPassedLevelsCount()
+    {
+        int count = 0;
+        foreach (bool level in IsLevelPassed)
+        {
+            if (level == true) count++;
+        }
+        return count;
+    }
 
     public class GameScore
     {
-
-
         //first level info
         public class FirstLevel
         {
@@ -122,6 +144,15 @@ public class GameStatus : MonoBehaviour
 
         //second level info
         public class SecondLevel
+        {
+            internal const float HightScore = 5f;
+            internal const float MiddleScore = 7f;
+            internal const float LowScore = 9f;
+
+            internal static int bestResult = 0;
+        }
+
+        public class ThirdLevel
         {
             internal const float HightScore = 5f;
             internal const float MiddleScore = 7f;
@@ -148,12 +179,16 @@ public class GameStatus : MonoBehaviour
         {
             switch (currentLevel)
             {
-                case 1:
+                case 0:
                     if (FirstLevel.bestResult < score) FirstLevel.bestResult = score;
                     break;
 
-                case 2:
+                case 1:
                     if (SecondLevel.bestResult < score) SecondLevel.bestResult = score;
+                    break;
+
+                case 2:
+                    if (ThirdLevel.bestResult < score) ThirdLevel.bestResult = score;
                     break;
             }
         }
@@ -169,10 +204,12 @@ public class GameStatus : MonoBehaviour
         {
             switch (CurrentLevel)
             {
-                case 1:
+                case 0:
                     return GetScore(FirstLevel.HightScore, FirstLevel.MiddleScore, FirstLevel.LowScore);
-                case 2:
+                case 1:
                     return GetScore(SecondLevel.HightScore, SecondLevel.MiddleScore, SecondLevel.LowScore);
+                case 2:
+                    return GetScore(ThirdLevel.HightScore, ThirdLevel.MiddleScore, ThirdLevel.LowScore);
             }
             return 0;
         }

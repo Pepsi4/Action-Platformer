@@ -34,7 +34,6 @@ public class ScorePanelScript : MonoBehaviour
         nextLevelButton = GameObject.Find("Canvas/ScorePanel/NextLevel");
         //
         nextLevelButton.GetComponent<Button>().onClick.AddListener(GoToSelectMenu);
-        Debug.Log(nextLevelButton.GetComponent<Button>().enabled);
     }
 
     private void GoToSelectMenu()

@@ -25,7 +25,7 @@ public class SelectScene : MonoBehaviour
         //Initialization the each button in array.
         for (int x = 0; x < button.Length; x++)
         {
-            button[x] = GameObject.Find("Canvas/Level (" + (x + 1) + ")");
+            button[x] = GameObject.Find("Canvas/Levels/Level (" + x + ")");
         }
         //adding to the levels onClick events
         button[0].GetComponent<Button>().onClick.AddListener(delegate
@@ -62,56 +62,45 @@ public class SelectScene : MonoBehaviour
 
     //aray of small stars
     GameObject[] star;
-    //the size of the array of small stars
-    private const int StarArraySize = 10;
+    //the size of the array of small stars.
+    private const int StarArraySize = 9;
 
     private void DeclareStars()
     {
         //creating an array with const size
         star = new GameObject[StarArraySize];
+
+        int starNumber = 0;
         //declare each star. 3 stars per button.
-        star[1] = GameObject.Find("Canvas/Level (1)/Level Stars (1)/Star (1)");
-        star[2] = GameObject.Find("Canvas/Level (1)/Level Stars (1)/Star (2)");
-        star[3] = GameObject.Find("Canvas/Level (1)/Level Stars (1)/Star (3)");
-
-        //second button
-        star[4] = GameObject.Find("Canvas/Level (2)/Level Stars (2)/Star (1)");
-        star[5] = GameObject.Find("Canvas/Level (2)/Level Stars (2)/Star (2)");
-        star[6] = GameObject.Find("Canvas/Level (2)/Level Stars (2)/Star (3)");
-
-        //third button
-        star[7] = GameObject.Find("Canvas/Level (3)/Level Stars (3)/Star (1)");
-        star[8] = GameObject.Find("Canvas/Level (3)/Level Stars (3)/Star (2)");
-        star[9] = GameObject.Find("Canvas/Level (3)/Level Stars (3)/Star (3)");
+        for (int i = 0; i < StarArraySize / 3; i++)
+        {
+            for (int x = 0; x < StarArraySize / 3; x++)
+            {
+                star[starNumber] = GameObject.Find("Canvas/Levels/Level (" + i + ")/Level Stars/Star (" + x + ")");
+                starNumber++;
+            }
+        }
     }
-    
+
     private void CheckStars()
     {
         DeclareStars();
 
         int bestResult = GameStatus.GameScore.FirstLevel.bestResult;
-        ChangeStarColor(1, bestResult);
+        ChangeStarColor(bestResult , 0);
 
         bestResult = GameStatus.GameScore.SecondLevel.bestResult;
-        ChangeStarColor(2, bestResult);
+        ChangeStarColor(bestResult, 1);
+
+        bestResult = GameStatus.GameScore.ThirdLevel.bestResult;
+        ChangeStarColor(bestResult, 2);
     }
-
-    private void ChangeStarColor(int level, int starCounter)
+    //ERROR
+    private void ChangeStarColor(int starCounter, int level)
     {
-        if (level == 1)
+        for (int x = level * 3; x < starCounter + level * 3; x++)
         {
-            for (int x = 1; x <= starCounter; x++)
-            {
-                star[x].GetComponent<Image>().color = new Color(255, 255, 255);
-            }  
-        }
-
-        if (level == 2)
-        {
-            for (int x = 4; x <= starCounter + 3; x++)
-            {
-                star[x].GetComponent<Image>().color = new Color(255, 255, 255);
-            }
+            star[x].GetComponent<Image>().color = new Color(255, 255, 255);
         }
     }
 
@@ -119,9 +108,9 @@ public class SelectScene : MonoBehaviour
     private void LoadTheLevel(int level)
     {
         //loads level
-        SceneManager.LoadScene("Level (" + (level + 1) + ")");
+        SceneManager.LoadScene("Level (" + level + ")");
         //level++
-        GameStatus.CurrentLevel = level + 1;
+        GameStatus.CurrentLevel = level;
     }
 
     private void LoadTutorial()
@@ -134,17 +123,35 @@ public class SelectScene : MonoBehaviour
         Application.Quit();
     }
 
+    class LastButtonException : System.Exception
+    {
+    }
+
     private void OpenLevels()
     {
         //checks the passed levels and makes enable related buttons
-        for (int i = 0; i < GameStatus.IsLevelPassed.Length; i++)
+        for (int i = 0; i < GameStatus.LevelCount; i++)
         {
+            //if the previous level is passed
             if (GameStatus.IsLevelPassed[i])
             {
-                //makes button enabled
-                button[i].GetComponent<Button>().enabled = true;
-                //changes the color of enabled button
-                button[i].GetComponent<Image>().color = blue;
+                if (i == GameStatus.LevelCount)
+                {
+                    //If the next button is not exist and we have nothing to open.
+                    throw new System.IndexOutOfRangeException();
+                }
+
+                try
+                {
+                    //makes next button enabled
+                    button[i + 1].GetComponent<Button>().enabled = true;
+                    //changes the color of enabled button
+                    button[i + 1].GetComponent<Image>().color = blue;
+                }
+                catch (System.IndexOutOfRangeException e)
+                {
+                    Debug.Log("All levels are passed.");
+                }
             }
         }
     }
@@ -160,6 +167,7 @@ public class SelectScene : MonoBehaviour
         GameStatus.UnPause();
         //Reset HP
         PlayerScript.Lifes = PlayerScript.LifesMax;
-
     }
 }
+
+
