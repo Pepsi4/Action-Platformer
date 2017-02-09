@@ -77,6 +77,7 @@ public class ScorePanelScript : MonoBehaviour
             if (currentStarNumber >= score + 1)
             {
                 yield break;
+                
             }
 
             currentStarNumber++;
@@ -95,5 +96,19 @@ public class ScorePanelScript : MonoBehaviour
         //recursion
         //for the current star
         StartCoroutine(ShowStarProcessing(score));
+    }
+
+
+   public class A
+    {
+        void ch()
+        {
+            
+        }
+    }
+
+    class B : A
+    {
+      
     }
 }

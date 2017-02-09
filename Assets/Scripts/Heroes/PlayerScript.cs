@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class PlayerScript : MonoBehaviour
 {
-    
+
     private static int lifesMax = 3;
     /// <summary>
     /// Max value of hero's HP
@@ -40,7 +40,7 @@ public class PlayerScript : MonoBehaviour
         get { return isCanTakeDamage; }
         set { isCanTakeDamage = value; }
     }
-               
+
     private const float InvulTime = 1f;            //how long main hero is can't be touched
     private const float InvulAnimationTime = 0.2f; //how often main hero is blblinking
     //Main hero's rigibody
@@ -60,29 +60,29 @@ public class PlayerScript : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        // If main hero is triggering with the objects 
-        //with IsDealDamage = true fields 
-        //and hero is not invuled
-        try
+        if (collision.gameObject.GetComponent<ObjectInfo>().IsDealDamage == true && isCanTakeDamage)
         {
-            if (collision.gameObject.GetComponent<ObjectInfo>().IsDealDamage == true && isCanTakeDamage)
+            if (!IsHealthLow()) //if we have more than 0 hp
             {
-                if (IsHealthLow()) return;          //return from the function if the health are <= 0
                 GetTheInvul();                      // Our hero is invuled for InvulTime now
-                GetDamage(collision);               //Lose an HP.
-                if (IsHealthLow()) EndTheGame();    //If our hp is = 0 now.
+                GetDamage(collision);               // Lose an HP.
             }
-        }
-        catch (System.NullReferenceException ex)
-        {
-            //ex code here
+
+            if (IsHealthLow()) //If our hp is <= 0 now.
+            {
+                EndTheGame();
+                return;
+            }
         }
     }
 
     private void EndTheGame()
     {
-        
+        Debug.Log("Low HP");
+        GameStatus.StopTheGame(true);
     }
+
+
 
     private bool IsHealthLow()
     {
@@ -97,7 +97,7 @@ public class PlayerScript : MonoBehaviour
     private void GetTheInvul()
     {
         StartCoroutine(InvulThePlayerAnimation());
-        StartCoroutine(InvulThePlayer()); 
+        StartCoroutine(InvulThePlayer());
     }
 
     IEnumerator InvulThePlayer()
@@ -115,7 +115,7 @@ public class PlayerScript : MonoBehaviour
         }
         GetComponent<SpriteRenderer>().enabled = true;
     }
-    
+
     private void MoveInput()
     {
 #if (FirstVersion)
@@ -138,7 +138,7 @@ public class PlayerScript : MonoBehaviour
         {
             rb.AddForce(new Vector2(0f, -MoveSpeed));
         }
-    
+
 #endif
 
 #if (SecondVersion)
@@ -163,24 +163,31 @@ public class PlayerScript : MonoBehaviour
 
     private void GetDamage(Collider2D coll)
     {
+        
         StartCoroutine(DestroyTheLife(lifes, coll));
+        lifes--;
         isCanTakeDamage = false;
     }
 
     private IEnumerator DestroyTheLife(int lifeNumber, Collider2D coll)
     {
+        //getting the fillAmount from the lifeNumber obj
         float fillAmount = GameObject.Find("Canvas/Health (" + lifeNumber + ")").GetComponent<Image>().fillAmount;
 
-        if (fillAmount > 0)
+        if (fillAmount > 0) // if the fillAmount haven't min value (min value: 0; max: 1)
         {
+            // -.01 fillAmount to the life obj
             GameObject.Find("Canvas/Health (" + lifeNumber + ")").GetComponent<Image>().fillAmount -= 0.01f;
+            //waiting some time
             yield return new WaitForSeconds(0.01f);
-            StartCoroutine(DestroyTheLife(lifes, coll));
+            //recursion
+            StartCoroutine(DestroyTheLife(lifeNumber, coll));
+            //exit from the corountine
             yield break;
         }
-        if (fillAmount <= 0)
+        if (fillAmount <= 0) //if the fillAmount have the min value
         {
-            lifes--;
+            //lifes--;
         }
     }
 

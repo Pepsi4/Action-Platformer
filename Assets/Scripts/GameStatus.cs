@@ -20,6 +20,22 @@ public class GameStatus : MonoBehaviour
         GameObject.Find("Canvas/ScorePanel").GetComponent<ScorePanelScript>().ShowStar();
     }
 
+    public static void StopTheGame(bool isForced)
+    {
+        if (isForced)
+        {
+            //UI part
+            //starts the animation
+            GameObject.Find("Canvas/ScorePanel").GetComponent<Animator>().Play("ScorePanel");
+            //updating text
+            GameObject.Find("Canvas/ScorePanel/ScoreText").GetComponent<Text>().text = "Your time: " + GameStatus.TimeActive.ToString("0.##");
+
+            //pause the game
+            GameStatus.Pause();
+        }
+
+    }
+
     //todo
     //public static int GetLevelsCount()
     //{
@@ -29,7 +45,7 @@ public class GameStatus : MonoBehaviour
     //We have to pause the game sometimes.
     //For ex: the level finished by player.
     /// <summary>
-    /// Freezing gameobjects. Stops hero and ballooon spawning. Makes game`s IsActive disabled.
+    /// Freezing gameobjects. Stops hero and ballooon spawning. Makes game`s IsActive disabled. Invuled mainhero.
     /// </summary>
     public static void Pause()
     {
