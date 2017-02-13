@@ -98,7 +98,11 @@
     <Compile Include="Assets\Scripts\Ui and Menu\MenuScript.cs" />
     <Compile Include="Assets\Scripts\Ui and Menu\ScorePanelScript.cs" />
     <Compile Include="Assets\Scripts\Ui and Menu\SelectScene.cs" />
+    <Compile Include="Assets\Scripts\Ui and Menu\TutorialScene.cs" />
     <Compile Include="Assets\Scripts\Ui and Menu\UiScript.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Resources\Texts\Tutorial.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

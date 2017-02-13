@@ -97,18 +97,4 @@ public class ScorePanelScript : MonoBehaviour
         //for the current star
         StartCoroutine(ShowStarProcessing(score));
     }
-
-
-   public class A
-    {
-        void ch()
-        {
-            
-        }
-    }
-
-    class B : A
-    {
-      
-    }
 }

@@ -115,7 +115,7 @@ public class SelectScene : MonoBehaviour
 
     private void LoadTutorial()
     {
-        SceneManager.LoadScene("Tutorial");
+        SceneManager.LoadScene("HowToPlay");
     }
 
     private void Exit()

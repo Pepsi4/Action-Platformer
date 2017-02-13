@@ -49,6 +49,7 @@ public class GameStatus : MonoBehaviour
     /// </summary>
     public static void Pause()
     {
+        Debug.Log("Paused");
         //time counter frozen
         //Stops spawning the balloons
         GameStatus.IsActive = false;
