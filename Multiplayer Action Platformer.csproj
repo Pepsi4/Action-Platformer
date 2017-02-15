@@ -99,6 +99,7 @@
     <Compile Include="Assets\Scripts\Ui and Menu\ScorePanelScript.cs" />
     <Compile Include="Assets\Scripts\Ui and Menu\SelectScene.cs" />
     <Compile Include="Assets\Scripts\Ui and Menu\TutorialScene.cs" />
+    <Compile Include="Assets\Scripts\Ui and Menu\TutorialTrigger.cs" />
     <Compile Include="Assets\Scripts\Ui and Menu\UiScript.cs" />
   </ItemGroup>
   <ItemGroup>

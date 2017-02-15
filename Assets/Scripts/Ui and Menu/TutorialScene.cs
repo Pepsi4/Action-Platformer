@@ -8,8 +8,14 @@ public class TutorialScene : MonoBehaviour
     private Button _exitButton;
     private Text _text;
 
-    //how many times the button 'F' pressed
-    private static int _counter = 0;
+    private static int _tipNumber = 0;
+
+    public static int TipNumber
+    {
+        get { return _tipNumber; }
+        set { _tipNumber = value; }
+    }
+
 
     void Start()
     {
@@ -21,8 +27,7 @@ public class TutorialScene : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F))
         {
-            ChangeTheText();
-            _counter++;
+            GameStatus.UnPause();
         }
     }
 
@@ -38,14 +43,17 @@ public class TutorialScene : MonoBehaviour
         });
     }
 
-    private void ChangeTheText()
+    /// <summary>
+    /// Set to the text panel string from the txt file with the currnet number. (the txt is splited by enter)
+    /// </summary>
+    public static void ChangeTheText()
     {
         //full text
         TextAsset textFull = Resources.Load<TextAsset>("Texts/Tutorial");
-        //now our text is array and splited by new line.
+        //now our text is array which is splited by new line.
         string[] textArray = textFull.text.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
         //get and set the current string
-        _text.text = textArray[_counter];
+        GameObject.Find("Canvas/Panel/Text").GetComponent<Text>().text = textArray[_tipNumber];
     }
 
     //private void HideTheDialog()

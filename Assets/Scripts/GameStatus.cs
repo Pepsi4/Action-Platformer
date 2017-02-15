@@ -79,7 +79,7 @@ public class GameStatus : MonoBehaviour
         PlayerScript.IsCanTakeDamage = true;
 
         //unfreezing main hero
-        //GameObject.Find("MainHero").GetComponent<Rigidbody2D>().constraints = 0;
+        GameObject.Find("MainHero").GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeRotation;
 
         //unfreezing balloons
         GameObject[] movingObjects = GameObject.FindGameObjectsWithTag("Moving");
