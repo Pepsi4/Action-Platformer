@@ -21,13 +21,16 @@ public class TutorialScene : MonoBehaviour
     {
         Initialization();
         GameStatus.Pause();
+        //in tutorial our hero can't take any dmg
+        PlayerScript.IsCanTakeDamage = false;
+        Debug.Log(PlayerScript.IsCanTakeDamage + "   is can take dmg");
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.F))
         {
-            GameStatus.UnPause();
+            GameStatus.UnPause(false);
         }
     }
 

@@ -1,2 +1,2 @@
-Welcome to the tutorial!   (Press F to continue...)
+Use buttons A, D and Space to move your character.
 Here you will teach how to play this game and what you should avoid.

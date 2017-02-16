@@ -33,13 +33,14 @@ public class GameStatus : MonoBehaviour
             //pause the game
             GameStatus.Pause();
         }
-
     }
 
-    //todo
-    //public static int GetLevelsCount()
-    //{
+    //private static bool isPaused = false;
 
+    //public static bool IsPaused
+    //{
+    //    get { return isPaused; }
+    //    set { IsPaused = value; }
     //}
 
     //We have to pause the game sometimes.
@@ -77,6 +78,29 @@ public class GameStatus : MonoBehaviour
 
         //player can take dmg again 
         PlayerScript.IsCanTakeDamage = true;
+
+        //unfreezing main hero
+        GameObject.Find("MainHero").GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeRotation;
+
+        //unfreezing balloons
+        GameObject[] movingObjects = GameObject.FindGameObjectsWithTag("Moving");
+
+        foreach (GameObject obj in movingObjects)
+        {
+            obj.GetComponent<Rigidbody2D>().constraints = 0;
+        }
+    }
+
+    public static void UnPause(bool isTakeDamage)
+    {
+        //sets game as active again
+        IsActive = true;
+
+        if (isTakeDamage)
+        {
+            //player can take dmg again 
+            PlayerScript.IsCanTakeDamage = true;
+        }
 
         //unfreezing main hero
         GameObject.Find("MainHero").GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeRotation;

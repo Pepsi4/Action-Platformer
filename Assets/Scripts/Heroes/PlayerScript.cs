@@ -65,7 +65,7 @@ public class PlayerScript : MonoBehaviour
             if (!IsHealthLow()) //if we have more than 0 hp
             {
                 GetTheInvul();                      // Our hero is invuled for InvulTime now
-                GetDamage(collision);               // Lose an HP.
+                GetDamage();               // Lose an HP.
             }
 
             if (IsHealthLow()) //If our hp is <= 0 now.
@@ -161,15 +161,14 @@ public class PlayerScript : MonoBehaviour
 #endif
     }
 
-    private void GetDamage(Collider2D coll)
+    private void GetDamage()
     {
-        
-        StartCoroutine(DestroyTheLife(lifes, coll));
+        StartCoroutine(DestroyTheLife(lifes));
         lifes--;
         isCanTakeDamage = false;
     }
 
-    private IEnumerator DestroyTheLife(int lifeNumber, Collider2D coll)
+    private IEnumerator DestroyTheLife(int lifeNumber)
     {
         //getting the fillAmount from the lifeNumber obj
         float fillAmount = GameObject.Find("Canvas/Health (" + lifeNumber + ")").GetComponent<Image>().fillAmount;
@@ -181,7 +180,7 @@ public class PlayerScript : MonoBehaviour
             //waiting some time
             yield return new WaitForSeconds(0.01f);
             //recursion
-            StartCoroutine(DestroyTheLife(lifeNumber, coll));
+            StartCoroutine(DestroyTheLife(lifeNumber));
             //exit from the corountine
             yield break;
         }

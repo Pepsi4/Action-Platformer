@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class TutorialTrigger : MonoBehaviour {
 
-
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.gameObject.name == "MainHero")
+        if (collision.gameObject.name == "MainHero" && GameStatus.IsActive)
         {
             Debug.Log("Next Tutorial tip");
             //makes the trigger zone unenabled
