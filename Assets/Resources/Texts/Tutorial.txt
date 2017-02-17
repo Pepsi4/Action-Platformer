@@ -1,2 +1,4 @@
-Use buttons A, D and Space to move your character.
-Here you will teach how to play this game and what you should avoid.
+Use buttons A, D and Space to move your character. (Press F to continue...)
+Be careful, all things around you will hit you if you will contact them! But in the tutorial you can't take any damage (Press F to continue...)
+Like ballloons, houses, trees, etc.  Neither the road on bottom. (Press F to continue...)
+Move to the flag which in the right corner of map to finish the level! (Press F to continue...)
