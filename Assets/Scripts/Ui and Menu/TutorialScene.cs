@@ -19,6 +19,8 @@ public class TutorialScene : MonoBehaviour
 
     void Start()
     {
+        Debug.Log(GameStatus.IsTutorialNow + " : is tutor now");
+
         Initialization();
         GameStatus.Pause();
         //in tutorial our hero can't take any dmg
@@ -39,9 +41,11 @@ public class TutorialScene : MonoBehaviour
         _text = GameObject.Find("Canvas/Panel/Text").GetComponent<Text>();
         _exitButton = GameObject.Find("Canvas/Exit").GetComponent<Button>();
 
-        //Loading SelectScene when we click it 
+        //exit from the tutorial
         _exitButton.onClick.AddListener(delegate
         {
+            GameStatus.IsTutorialNow = false;
+            //Loading SelectScene when we click it
             SceneManager.LoadScene("SelectScene");
         });
     }

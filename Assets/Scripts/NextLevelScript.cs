@@ -27,8 +27,17 @@ public class NextLevelScript : MonoBehaviour
     {
         //stops the game and doing some animations
         GameStatus.StopTheGame();
-        //checked the level as passed
-        GameStatus.IsLevelPassed[GameStatus.CurrentLevel] = true;
+
+        //If we're playing tutorial, we shouldn't make available next level
+        if (!GameStatus.IsTutorialNow)
+        {
+            //checked the level as passed
+            GameStatus.IsLevelPassed[GameStatus.CurrentLevel] = true;
+        }
+        else //exit from the tutorial
+        {
+            GameStatus.IsTutorialNow = false;
+        }
         //sets the best result for the current level
         GameStatus.GameScore.SetTheBestResult(GameStatus.GameScore.GetScoreForCurrentLevel());
     }

@@ -38,6 +38,11 @@ public class ScorePanelScript : MonoBehaviour
 
     private void GoToSelectMenu()
     {
+        if (GameStatus.IsTutorialNow) //make visible that we are not in the tutorial
+        {
+            GameStatus.IsTutorialNow = false;
+        }
+
         SceneManager.LoadScene("SelectScene");
     }
 

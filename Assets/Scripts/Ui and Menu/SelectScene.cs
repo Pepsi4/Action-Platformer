@@ -115,6 +115,8 @@ public class SelectScene : MonoBehaviour
 
     private void LoadTutorial()
     {
+        GameStatus.CurrentLevel = -1;
+        GameStatus.IsTutorialNow = true;
         SceneManager.LoadScene("HowToPlay");
     }
 

@@ -35,13 +35,13 @@ public class GameStatus : MonoBehaviour
         }
     }
 
-    //private static bool isPaused = false;
+    private static bool isTutorialNow = false;
 
-    //public static bool IsPaused
-    //{
-    //    get { return isPaused; }
-    //    set { IsPaused = value; }
-    //}
+    public static bool IsTutorialNow
+    {
+        get { return isTutorialNow; }
+        set { isTutorialNow = value; }
+    }
 
     //We have to pause the game sometimes.
     //For ex: the level finished by player.

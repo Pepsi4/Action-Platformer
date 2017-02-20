@@ -4,10 +4,10 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System;
 
 public class PlayerScript : MonoBehaviour
 {
-
     private static int lifesMax = 3;
     /// <summary>
     /// Max value of hero's HP
@@ -60,19 +60,27 @@ public class PlayerScript : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.gameObject.GetComponent<ObjectInfo>().IsDealDamage == true && isCanTakeDamage)
-        {
-            if (!IsHealthLow()) //if we have more than 0 hp
-            {
-                GetTheInvul();                      // Our hero is invuled for InvulTime now
-                GetDamage();               // Lose an HP.
-            }
 
-            if (IsHealthLow()) //If our hp is <= 0 now.
+        try
+        {
+            if (collision.gameObject.GetComponent<ObjectInfo>().IsDealDamage == true && isCanTakeDamage)
             {
-                EndTheGame();
-                return;
+                if (!IsHealthLow()) //if we have more than 0 hp
+                {
+                    GetTheInvul(); // Our hero is invuled for InvulTime now
+                    GetDamage(); // Lose an HP.
+                }
+
+                if (IsHealthLow()) //If our hp is <= 0 now.
+                {
+                    EndTheGame();
+                    return;
+                }
             }
+        }
+        catch (NullReferenceException) // if the triggered game object has`t objInfo component
+        {
+            Debug.Log("Gameoject has`t ObjectInfo component");
         }
     }
 
