@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class GameStatus : MonoBehaviour
 {
@@ -73,14 +74,24 @@ public class GameStatus : MonoBehaviour
     /// </summary>
     public static void UnPause()
     {
+
         //sets game as active again
         IsActive = true;
 
         //player can take dmg again 
         PlayerScript.IsCanTakeDamage = true;
 
-        //unfreezing main hero
-        GameObject.Find("MainHero").GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeRotation;
+        try //Main hero can be not exist right now on scene.
+        {
+            //unfreezing main hero
+            GameObject.Find("MainHero").GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeRotation;
+        }
+        catch (NullReferenceException nullRef)
+        {
+            Debug.Log("Main hero is not exist right now. We can't unfreez it.");
+        }
+        
+
 
         //unfreezing balloons
         GameObject[] movingObjects = GameObject.FindGameObjectsWithTag("Moving");
@@ -202,6 +213,15 @@ public class GameStatus : MonoBehaviour
             internal static int bestResult = 0;
         }
 
+        public class Tutorial
+        {
+            internal const float HightScore = 300f;
+            internal const float MiddleScore = 600f;
+            internal const float LowScore = 900f;
+
+            internal static int bestResult = 0;
+        }
+
         internal enum Score : int
         {
             HightScore = 3,
@@ -220,6 +240,10 @@ public class GameStatus : MonoBehaviour
         {
             switch (currentLevel)
             {
+                case -1:
+                    if (Tutorial.bestResult < score) Tutorial.bestResult = score;
+                    break;
+
                 case 0:
                     if (FirstLevel.bestResult < score) FirstLevel.bestResult = score;
                     break;
@@ -245,6 +269,8 @@ public class GameStatus : MonoBehaviour
         {
             switch (CurrentLevel)
             {
+                case -1:
+                    return GetScore(Tutorial.HightScore, Tutorial.MiddleScore, Tutorial.LowScore);
                 case 0:
                     return GetScore(FirstLevel.HightScore, FirstLevel.MiddleScore, FirstLevel.LowScore);
                 case 1:

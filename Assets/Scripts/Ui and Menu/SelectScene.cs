@@ -44,13 +44,19 @@ public class SelectScene : MonoBehaviour
             ResetPastData();
         });
 
+        //how to play button
+        howToPlayButton = GameObject.Find("Canvas/HowToPlay");
+        howToPlayButton.GetComponent<Button>().onClick.AddListener(delegate
+        {
+            LoadTutorial();
+            ResetPastData();
+        });
+
         //exit button
         exitButton = GameObject.Find("Canvas/Exit");
         exitButton.GetComponent<Button>().onClick.AddListener(Exit);
 
-        //how to play button
-        howToPlayButton = GameObject.Find("Canvas/HowToPlay");
-        howToPlayButton.GetComponent<Button>().onClick.AddListener(LoadTutorial);
+
 
         //open level if the player unlocked it before.
         OpenLevels();
