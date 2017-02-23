@@ -36,6 +36,8 @@ public class GameStatus : MonoBehaviour
         }
     }
 
+    public static bool IsScorePanelShowing { get; set; }
+
     private static bool isTutorialNow = false;
 
     public static bool IsTutorialNow

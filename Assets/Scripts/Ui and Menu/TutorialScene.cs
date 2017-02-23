@@ -8,6 +8,7 @@ public class TutorialScene : MonoBehaviour
     private Button _exitButton;
     private Text _text;
 
+    private static int _tipCoount = 0;
     private static int _tipNumber = 0;
 
     public static int TipNumber
@@ -16,9 +17,27 @@ public class TutorialScene : MonoBehaviour
         set { _tipNumber = value; }
     }
 
+    private bool IsLastTip(int number)
+    {
+        if (number  == _tipCoount)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     void Start()
     {
+        TutorialTrigger[] triggers = GameObject.Find("TutorialTriggers").GetComponentsInChildren<TutorialTrigger>();
+        foreach (TutorialTrigger trigger in triggers)
+        {
+            _tipCoount++;
+        }
+
+        Debug.Log(_tipCoount + " : Tip`s count");
         Debug.Log(GameStatus.IsTutorialNow + " : is tutor now");
 
         Initialization();
@@ -30,7 +49,7 @@ public class TutorialScene : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKeyDown(KeyCode.F) && !IsLastTip(_tipNumber))
         {
             GameStatus.UnPause(false);
         }
