@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class UiScript : MonoBehaviour
 {
+    public GameStatus GameStatusPrefab;
     //using for constructor
     GameObject timePanelText;
 
@@ -18,6 +19,6 @@ public class UiScript : MonoBehaviour
 
     void UpdateTimer()
     {
-        timePanelText.GetComponent<Text>().text = GameStatus.TimeActive.ToString("0.##");
+        timePanelText.GetComponent<Text>().text = GameStatusPrefab.TimeActive.ToString("0.##");
     }
 }

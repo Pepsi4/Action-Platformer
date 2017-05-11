@@ -6,12 +6,14 @@ public class SelectScene : MonoBehaviour
 {
     //blue color
     Color blue = new Color32(163, 240, 255, 255);
-
+    
     //buttons 
     GameObject[] button;
     GameObject exitButton;
     GameObject howToPlayButton;
 
+    public GameScore GameScorePrefab;
+    public GameStatus GameStatusPrefab;
     //the size of button's array
     private const int ButtonCount = 3;
 
@@ -87,18 +89,19 @@ public class SelectScene : MonoBehaviour
             }
         }
     }
+    
 
+    
     private void CheckStars()
     {
         DeclareStars();
+        int bestResult = GameScorePrefab.firstLevel.bestResult;
+        ChangeStarColor(bestResult, 0);
 
-        int bestResult = GameStatus.GameScore.FirstLevel.bestResult;
-        ChangeStarColor(bestResult , 0);
-
-        bestResult = GameStatus.GameScore.SecondLevel.bestResult;
+        bestResult = GameScorePrefab.secondLevel.bestResult;
         ChangeStarColor(bestResult, 1);
 
-        bestResult = GameStatus.GameScore.ThirdLevel.bestResult;
+        bestResult = GameScorePrefab.thirdLevel.bestResult;
         ChangeStarColor(bestResult, 2);
     }
     //ERROR
@@ -116,12 +119,12 @@ public class SelectScene : MonoBehaviour
         //loads level
         SceneManager.LoadScene("Level (" + level + ")");
         //level++
-        GameStatus.CurrentLevel = level;
+        GameStatusPrefab.CurrentLevel = level;
     }
 
     private void LoadTutorial()
     {
-        GameStatus.CurrentLevel = -1;
+        GameStatusPrefab.CurrentLevel = -1;
         GameStatus.IsTutorialNow = true;
         SceneManager.LoadScene("HowToPlay");
     }
@@ -140,26 +143,33 @@ public class SelectScene : MonoBehaviour
         //checks the passed levels and makes enable related buttons
         for (int i = 0; i < GameStatus.LevelCount; i++)
         {
-            //if the previous level is passed
-            if (GameStatus.IsLevelPassed[i])
+            try
             {
-                if (i == GameStatus.LevelCount)
+                //if the previous level is passed
+                if (GameStatus.IsLevelPassed[i])
                 {
-                    //If the next button is not exist and we have nothing to open.
-                    throw new System.IndexOutOfRangeException();
-                }
+                    if (i == GameStatus.LevelCount)
+                    {
+                        //If the next button is not exist and we have nothing to open.
+                        throw new System.IndexOutOfRangeException();
+                    }
 
-                try
-                {
-                    //makes next button enabled
-                    button[i + 1].GetComponent<Button>().enabled = true;
-                    //changes the color of enabled button
-                    button[i + 1].GetComponent<Image>().color = blue;
+                    try
+                    {
+                        //makes next button enabled
+                        button[i + 1].GetComponent<Button>().enabled = true;
+                        //changes the color of enabled button
+                        button[i + 1].GetComponent<Image>().color = blue;
+                    }
+                    catch (System.IndexOutOfRangeException e)
+                    {
+                        Debug.Log("All levels are passed.");
+                    }
                 }
-                catch (System.IndexOutOfRangeException e)
-                {
-                    Debug.Log("All levels are passed.");
-                }
+            }
+            catch (System.IndexOutOfRangeException)
+            {
+                Debug.Log("Menu opens first time.");
             }
         }
     }
@@ -170,7 +180,7 @@ public class SelectScene : MonoBehaviour
     private void ResetPastData()
     {
         //reset active time
-        GameStatus.TimeActive = 0;
+        GameStatusPrefab.TimeActive = 0;
         //reset data
         GameStatus.UnPause();
         //Reset HP

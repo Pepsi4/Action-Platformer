@@ -5,9 +5,13 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 using System;
+using UnityEngine.Networking;
 
-public class PlayerScript : MonoBehaviour
+
+public class PlayerScript : NetworkBehaviour
 {
+    public GameStatus GameStatusPrefab;
+
     private static int lifesMax = 3;
     /// <summary>
     /// Max value of hero's HP
@@ -42,25 +46,115 @@ public class PlayerScript : MonoBehaviour
     }
 
     private const float InvulTime = 1f;            //how long main hero is can't be touched
-    private const float InvulAnimationTime = 0.2f; //how often main hero is blblinking
+    private const float InvulAnimationTime = 0.2f; //how often main hero is bllinking
     //Main hero's rigibody
-    //using for moving him
+    //using to move it.
     private Rigidbody2D rb;
-
-
-    void Start()
-    {
-        rb = GetComponent<Rigidbody2D>();
-    }
 
     void Update()
     {
-        MoveInput();
+        Debug.Log("Local " + isLocalPlayer + "isServer" + isServer);
+        if (isLocalPlayer || isServer)
+        {
+            MoveInput();
+        }
     }
+
+    void Start()
+    {
+        DontDestroyOnLoad(this.gameObject);
+        Debug.Log("PlayerScript start");
+        rb = GetComponent<Rigidbody2D>();
+        CmdLoadScene();
+    }
+
+    
+
+    /// <summary>
+    /// The count of current connections.
+    /// </summary>
+    [SyncVar]
+    public int Connections;
+
+    [Command]
+    void CmdLoadScene()
+    {
+        if (Connections == 1)
+        {
+            NetworkManager.singleton.ServerChangeScene("Level (0)");
+            return;
+        }
+
+        Connections++;
+        Debug.Log(Connections + " : Connections ");
+    }
+
+    private void OnLevelWasLoaded(int level)
+    {
+        if (level == 2)
+        {
+            Debug.Log("Level 2");
+            CreateLocalObjects();
+        }
+    }
+
+    public void CreateLocalObjects()
+    {
+        //--- MainHero ---
+        //NetworkServer.Spawn(MainHero);
+
+
+        //--- Camera ---
+        GameObject camera = (GameObject)Resources.Load("GameObjects/MainCamera");
+        camera.GetComponent<CameraScript>().MainHero = this.gameObject;
+        Instantiate(camera);
+
+        //--- GameStatus ---
+        GameObject gameStatus = (GameObject)Resources.Load("GameObjects/GameStatus");
+        Instantiate(gameStatus);
+
+        //--- GameScore ---
+        GameObject gameScore = (GameObject)Resources.Load("GameObjects/GameScore");
+        gameScore.GetComponent<GameScore>().GameStatusPrefab = gameStatus.GetComponent<GameStatus>();
+        Instantiate(gameScore);
+
+        //--- Canvas ---
+        GameObject canvas = (GameObject)Resources.Load("GameObjects/Canvas");
+        canvas.GetComponentInChildren<ScorePanelScript>().GameScorePrefab = gameScore.GetComponent<GameScore>();
+        canvas.GetComponentInChildren<ScorePanelScript>().GameStatusPrefab = gameStatus.GetComponent<GameStatus>();
+        canvas.GetComponentInChildren<UiScript>().GameStatusPrefab = gameStatus.GetComponent<GameStatus>();
+        var canvasPrefab = Instantiate(canvas);
+        canvasPrefab.name = "Canvas";
+
+        //--- Event System ---
+        //Instantiate((GameObject)Resources.Load("GameObjects/EventSystem"));
+    }
+
+    //Smells like a local player spirit
+    //public override void OnStartServer()
+    //{
+    //    Debug.Log("OnStartServer");
+    //    //CreateLocalObjects();
+    //}
+
+    ////What we should to initialize for the local player. Camera, balloon spawner, etc.
+    //public void OnConnectedToServer()
+    //{
+    //    Debug.Log("OnStartLocalPlayer");
+    //    CreateLocalObjects();
+    //}
+
+    //What we should to initialize for the local player. Camera, balloon spawner, etc.
+    //public override void OnStartLocalPlayer()
+    //{
+    //    Debug.Log("OnStartLocalPlayer");
+    //    CreateLocalObjects();
+    //}
+
+
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-
         try
         {
             if (collision.gameObject.GetComponent<ObjectInfo>().IsDealDamage == true && isCanTakeDamage)
@@ -87,10 +181,8 @@ public class PlayerScript : MonoBehaviour
     private void EndTheGame()
     {
         Debug.Log("Low HP");
-        GameStatus.StopTheGame(true);
+        GameStatusPrefab.StopTheGame(true);
     }
-
-
 
     private bool IsHealthLow()
     {
@@ -100,7 +192,6 @@ public class PlayerScript : MonoBehaviour
         }
         return false;
     }
-
 
     private void GetTheInvul()
     {
@@ -197,6 +288,4 @@ public class PlayerScript : MonoBehaviour
             //lifes--;
         }
     }
-
-
 }

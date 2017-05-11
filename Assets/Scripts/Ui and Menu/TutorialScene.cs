@@ -11,15 +11,17 @@ public class TutorialScene : MonoBehaviour
     private static int _tipCoount = 0;
     private static int _tipNumber = 0;
 
+    private  bool _isLevelFinished = false;
+
     public static int TipNumber
     {
         get { return _tipNumber; }
         set { _tipNumber = value; }
     }
 
-    private bool IsLastTip(int number)
+    public bool IsLastTip(int number)
     {
-        if (number  == _tipCoount)
+        if (number  ==  _tipCoount)
         {
             return true;
         }
@@ -49,8 +51,12 @@ public class TutorialScene : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F) && !IsLastTip(_tipNumber))
+        if (Input.GetKeyDown(KeyCode.F) && _isLevelFinished == false)
         {
+            if (IsLastTip(_tipNumber))
+            {
+                _isLevelFinished = true;
+            }
             GameStatus.UnPause(false);
         }
     }
@@ -81,10 +87,4 @@ public class TutorialScene : MonoBehaviour
         //get and set the current string
         GameObject.Find("Canvas/Panel/Text").GetComponent<Text>().text = textArray[_tipNumber];
     }
-
-    //private void HideTheDialog()
-    //{
-    //    _text.enabled = false;
-    //    _
-    //}
 }

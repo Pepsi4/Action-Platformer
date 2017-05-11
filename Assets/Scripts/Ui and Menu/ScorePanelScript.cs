@@ -5,6 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class ScorePanelScript : MonoBehaviour
 {
+    public GameStatus GameStatusPrefab;
+    public GameScore GameScorePrefab;
 
     //Button which should send us to the SelectScene.
     GameObject nextLevelButton;
@@ -22,6 +24,8 @@ public class ScorePanelScript : MonoBehaviour
 
     private void Start()
     {
+        Debug.Log("Current level : " + GameStatusPrefab.CurrentLevel);
+
         //size of array
         star = new GameObject[4];
 
@@ -53,10 +57,9 @@ public class ScorePanelScript : MonoBehaviour
 
     private void ShowStarOneByOne()
     {
-        int score = GameStatus.GameScore.GetScoreForCurrentLevel();
+        int score = GameScorePrefab.GetScoreForCurrentLevel();
         StartCoroutine(ShowStarProcessing(score));
     }
-
 
     private int currentStarNumber = 1;
 

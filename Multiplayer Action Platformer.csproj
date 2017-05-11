@@ -90,7 +90,11 @@
     <Compile Include="Assets\Scripts\Objects\Agro\RoadScript.cs" />
     <Compile Include="Assets\Scripts\Objects\Agro\TreeScript.cs" />
     <Compile Include="Assets\Scripts\Objects\Agro\UpBorder.cs" />
+    <Compile Include="Assets\Scripts\Objects\Friendly\StarScript.cs" />
+    <Compile Include="Assets\Scripts\Ui and Menu\GameScore.cs" />
     <Compile Include="Assets\Scripts\Ui and Menu\MenuScript.cs" />
+    <Compile Include="Assets\Scripts\Ui and Menu\Network\MyNetworkManager.cs" />
+    <Compile Include="Assets\Scripts\Ui and Menu\Network\PlayerNetwork.cs" />
     <Compile Include="Assets\Scripts\Ui and Menu\ScorePanelScript.cs" />
     <Compile Include="Assets\Scripts\Ui and Menu\SelectScene.cs" />
     <Compile Include="Assets\Scripts\Ui and Menu\TutorialScene.cs" />
@@ -98,6 +102,7 @@
     <Compile Include="Assets\Scripts\Ui and Menu\UiScript.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Fonts\Minecraft\readme.txt" />
     <None Include="Assets\Resources\Texts\Tutorial.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

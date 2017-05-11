@@ -8,19 +8,18 @@ public class BalloonSpawner : MonoBehaviour
     const float SpawnRangeX = 3f;
     const float SpawnTime = 0.5f;
 
-
+    public GameObject MainHero;
 
     //borders
     //are using for the max and the min X of balloon spawn
     GameObject leftBorder;
     GameObject rightBorder;
 
-    GameObject mainHero;
+    //GameObject mainHero;
 
     private void Start()
     {
-        //Main hero initialization 
-        mainHero = GameObject.Find("MainHero");
+        MainHero = this.gameObject;
 
         //initialization the borders
         leftBorder = GameObject.Find("Borders/Border (1)");
@@ -52,7 +51,7 @@ public class BalloonSpawner : MonoBehaviour
         float leftBorderX = leftBorder.GetComponent<Transform>().position.x;
         float rightBorderX = rightBorder.GetComponent<Transform>().position.x;
 
-        float mainHeroPositionX = mainHero.GetComponent<Transform>().position.x;
+        float mainHeroPositionX = MainHero.GetComponent<Transform>().position.x;
 
         while (true)
         {

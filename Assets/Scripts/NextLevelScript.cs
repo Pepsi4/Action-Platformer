@@ -6,7 +6,8 @@ public class NextLevelScript : MonoBehaviour
     //Trigger can work 2 times. It's coz of using type of collision: sphere.
     private bool isTriggerEnter2D = false;
 
-
+    public GameStatus GameStatusPrefab;
+    public GameScore GameScorePrefab;
     //constructor
     private void Start()
     {
@@ -26,19 +27,19 @@ public class NextLevelScript : MonoBehaviour
     void MainHeroEntered()
     {
         //stops the game and doing some animations
-        GameStatus.StopTheGame();
+        GameStatusPrefab.StopTheGame();
 
         //If we're playing tutorial, we shouldn't make available next level
         if (!GameStatus.IsTutorialNow)
         {
             //checked the level as passed
-            GameStatus.IsLevelPassed[GameStatus.CurrentLevel] = true;
+            GameStatus.IsLevelPassed[GameStatusPrefab.CurrentLevel] = true;
         }
         else //exit from the tutorial
         {
             GameStatus.IsTutorialNow = false;
         }
         //sets the best result for the current level
-        GameStatus.GameScore.SetTheBestResult(GameStatus.GameScore.GetScoreForCurrentLevel());
+        GameScorePrefab.SetTheBestResult(GameScorePrefab.GetScoreForCurrentLevel());
     }
 }
