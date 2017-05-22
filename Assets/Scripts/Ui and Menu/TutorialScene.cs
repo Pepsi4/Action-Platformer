@@ -13,7 +13,7 @@ public class TutorialScene : MonoBehaviour
 
     private  bool _isLevelFinished = false;
 
-    public static int TipNumber
+    public int TipNumber
     {
         get { return _tipNumber; }
         set { _tipNumber = value; }
@@ -31,6 +31,9 @@ public class TutorialScene : MonoBehaviour
         }
     }
 
+    public PlayerScript PlayerScriptPrefab;
+    public GameStatus GameStatusPrefab;
+
     void Start()
     {
         TutorialTrigger[] triggers = GameObject.Find("TutorialTriggers").GetComponentsInChildren<TutorialTrigger>();
@@ -40,13 +43,13 @@ public class TutorialScene : MonoBehaviour
         }
 
         Debug.Log(_tipCoount + " : Tip`s count");
-        Debug.Log(GameStatus.IsTutorialNow + " : is tutor now");
+        Debug.Log(GameStatusPrefab.IsTutorialNow + " : is tutor now");
 
         Initialization();
-        GameStatus.Pause();
+        GameStatusPrefab.Pause();
         //in tutorial our hero can't take any dmg
-        PlayerScript.IsCanTakeDamage = false;
-        Debug.Log(PlayerScript.IsCanTakeDamage + "   is can take dmg");
+        PlayerScriptPrefab.IsCanTakeDamage = false;
+        Debug.Log(PlayerScriptPrefab.IsCanTakeDamage + "   is can take dmg");
     }
 
     private void Update()
@@ -57,7 +60,7 @@ public class TutorialScene : MonoBehaviour
             {
                 _isLevelFinished = true;
             }
-            GameStatus.UnPause(false);
+            GameStatusPrefab.UnPause(false);
         }
     }
 
@@ -69,7 +72,7 @@ public class TutorialScene : MonoBehaviour
         //exit from the tutorial
         _exitButton.onClick.AddListener(delegate
         {
-            GameStatus.IsTutorialNow = false;
+            GameStatusPrefab.IsTutorialNow = false;
             //Loading SelectScene when we click it
             SceneManager.LoadScene("SelectScene");
         });

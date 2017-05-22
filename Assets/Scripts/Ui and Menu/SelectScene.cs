@@ -6,7 +6,7 @@ public class SelectScene : MonoBehaviour
 {
     //blue color
     Color blue = new Color32(163, 240, 255, 255);
-    
+
     //buttons 
     GameObject[] button;
     GameObject exitButton;
@@ -33,17 +33,17 @@ public class SelectScene : MonoBehaviour
         button[0].GetComponent<Button>().onClick.AddListener(delegate
         {
             LoadTheLevel(0);
-            ResetPastData();
+            GameStatusPrefab.ResetPastData();
         });
         button[1].GetComponent<Button>().onClick.AddListener(delegate
         {
             LoadTheLevel(1);
-            ResetPastData();
+            GameStatusPrefab.ResetPastData();
         });
         button[2].GetComponent<Button>().onClick.AddListener(delegate
         {
             LoadTheLevel(2);
-            ResetPastData();
+            GameStatusPrefab.ResetPastData();
         });
 
         //how to play button
@@ -51,7 +51,7 @@ public class SelectScene : MonoBehaviour
         howToPlayButton.GetComponent<Button>().onClick.AddListener(delegate
         {
             LoadTutorial();
-            ResetPastData();
+            GameStatusPrefab.ResetPastData();
         });
 
         //exit button
@@ -89,9 +89,9 @@ public class SelectScene : MonoBehaviour
             }
         }
     }
-    
 
-    
+
+
     private void CheckStars()
     {
         DeclareStars();
@@ -125,7 +125,7 @@ public class SelectScene : MonoBehaviour
     private void LoadTutorial()
     {
         GameStatusPrefab.CurrentLevel = -1;
-        GameStatus.IsTutorialNow = true;
+        GameStatusPrefab.IsTutorialNow = true;
         SceneManager.LoadScene("HowToPlay");
     }
 
@@ -141,14 +141,14 @@ public class SelectScene : MonoBehaviour
     private void OpenLevels()
     {
         //checks the passed levels and makes enable related buttons
-        for (int i = 0; i < GameStatus.LevelCount; i++)
+        for (int i = 0; i < GameStatusPrefab.LevelCount; i++)
         {
             try
             {
                 //if the previous level is passed
-                if (GameStatus.IsLevelPassed[i])
+                if (GameStatusPrefab.IsLevelPassed[i])
                 {
-                    if (i == GameStatus.LevelCount)
+                    if (i == GameStatusPrefab.LevelCount)
                     {
                         //If the next button is not exist and we have nothing to open.
                         throw new System.IndexOutOfRangeException();
@@ -172,19 +172,6 @@ public class SelectScene : MonoBehaviour
                 Debug.Log("Menu opens first time.");
             }
         }
-    }
-
-    /// <summary>
-    /// Resets past static data as: static-float time, etc.
-    /// </summary>
-    private void ResetPastData()
-    {
-        //reset active time
-        GameStatusPrefab.TimeActive = 0;
-        //reset data
-        GameStatus.UnPause();
-        //Reset HP
-        PlayerScript.Lifes = PlayerScript.LifesMax;
     }
 }
 

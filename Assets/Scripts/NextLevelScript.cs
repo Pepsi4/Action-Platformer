@@ -30,14 +30,14 @@ public class NextLevelScript : MonoBehaviour
         GameStatusPrefab.StopTheGame();
 
         //If we're playing tutorial, we shouldn't make available next level
-        if (!GameStatus.IsTutorialNow)
+        if (!GameStatusPrefab.IsTutorialNow)
         {
             //checked the level as passed
-            GameStatus.IsLevelPassed[GameStatusPrefab.CurrentLevel] = true;
+            GameStatusPrefab.IsLevelPassed[GameStatusPrefab.CurrentLevel] = true;
         }
         else //exit from the tutorial
         {
-            GameStatus.IsTutorialNow = false;
+            GameStatusPrefab.IsTutorialNow = false;
         }
         //sets the best result for the current level
         GameScorePrefab.SetTheBestResult(GameScorePrefab.GetScoreForCurrentLevel());

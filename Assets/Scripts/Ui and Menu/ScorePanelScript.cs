@@ -42,9 +42,9 @@ public class ScorePanelScript : MonoBehaviour
 
     private void GoToSelectMenu()
     {
-        if (GameStatus.IsTutorialNow) //make visible that we are not in the tutorial
+        if (GameStatusPrefab.IsTutorialNow) //make visible that we are not in the tutorial
         {
-            GameStatus.IsTutorialNow = false;
+            GameStatusPrefab.IsTutorialNow = false;
         }
 
         SceneManager.LoadScene("SelectScene");

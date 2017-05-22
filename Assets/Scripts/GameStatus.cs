@@ -8,17 +8,17 @@ public class GameStatus : MonoBehaviour
     /// <summary>
     /// If we are playing multiplayer.
     /// </summary>
-    public static bool IsMultiplayerNow;
+    public bool IsMultiplayerNow;
 
     /// <summary>
     /// If we scee the score panel (After passed or failed level).
     /// </summary>
-    public static bool IsScorePanelShowing { get; set; }
+    public bool IsScorePanelShowing { get; set; }
 
     /// <summary>
     /// If the tutorial scene now.
     /// </summary>
-    public static bool IsTutorialNow
+    public bool IsTutorialNow
     {
         get { return isTutorialNow; }
         set { isTutorialNow = value; }
@@ -27,7 +27,7 @@ public class GameStatus : MonoBehaviour
     /// <summary>
     /// The current value of level's count.
     /// </summary>
-    public static int LevelCount
+    public int LevelCount
     {
         get { return levelsCount; }
     }
@@ -35,7 +35,7 @@ public class GameStatus : MonoBehaviour
     /// <summary>
     /// Boolian shows us: if the game is active or not.
     /// </summary>
-    public static bool IsActive
+    public bool IsActive
     {
         get { return isActive; }
         set { isActive = value; }
@@ -59,11 +59,13 @@ public class GameStatus : MonoBehaviour
     /// <summary>
     /// Array is contains bool values - if we passed the level already. Lengh = static int levelsCount.
     /// </summary>
-    public static bool[] IsLevelPassed = new bool[levelsCount];
+    public bool[] IsLevelPassed = new bool[levelsCount];
+
+    public GameObject MainHero;
     
-    private static bool isActive = true;
+    private bool isActive = true;
     private int currentLevel = 0;
-    private static bool isTutorialNow = false;
+    private bool isTutorialNow = false;
     #endregion
 
     #region public methods
@@ -82,7 +84,7 @@ public class GameStatus : MonoBehaviour
         GameObject.Find("Canvas/ScorePanel/ScoreText").GetComponent<Text>().text = "Your time: " + TimeActive.ToString("0.##");
 
         //pause the game
-        GameStatus.Pause();
+        Pause();
         //show the stars
         GameObject.Find("Canvas/ScorePanel").GetComponent<ScorePanelScript>().ShowStar();
     }
@@ -102,22 +104,22 @@ public class GameStatus : MonoBehaviour
             GameObject.Find("Canvas/ScorePanel/ScoreText").GetComponent<Text>().text = "Your time: " +  TimeActive.ToString("0.##");
 
             //pause the game
-            GameStatus.Pause();
+            Pause();
         }
     }
 
     /// <summary>
     /// Freezing gameobjects. Stops hero and ballooon spawning. Makes game`s IsActive disabled. Invuled mainhero.
     /// </summary>
-    public static void Pause()
+    public void Pause()
     {
         Debug.Log("Paused");
         //time counter frozen
         //Stops spawning the balloons
-        GameStatus.IsActive = false;
+        IsActive = false;
 
         //The hero should be invulnerable.
-        PlayerScript.IsCanTakeDamage = false;
+        MainHero.GetComponent<PlayerScript>().IsCanTakeDamage = false;
         //freez the main hero
         GameObject.Find("MainHero").GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeAll;
 
@@ -132,14 +134,14 @@ public class GameStatus : MonoBehaviour
     /// <summary>
     /// Makes game active; hero can take dmg; unfreezing balloons and main hero
     /// </summary>
-    public static void UnPause()
+    public void UnPause()
     {
 
         //sets game as active again
         IsActive = true;
 
         //player can take dmg again 
-        PlayerScript.IsCanTakeDamage = true;
+        MainHero.GetComponent<PlayerScript>().IsCanTakeDamage = true;
 
         try //Main hero can be not exist right now on scene.
         {
@@ -164,7 +166,7 @@ public class GameStatus : MonoBehaviour
     /// Unpausing the game.
     /// </summary>
     /// <param name="isTakeDamage"></param>
-    public static void UnPause(bool isTakeDamage)
+    public void UnPause(bool isTakeDamage)
     {
         //sets game as active again
         IsActive = true;
@@ -172,7 +174,7 @@ public class GameStatus : MonoBehaviour
         if (isTakeDamage)
         {
             //player can take dmg again 
-            PlayerScript.IsCanTakeDamage = true;
+            MainHero.GetComponent<PlayerScript>().IsCanTakeDamage = true;
         }
 
         //unfreezing main hero
@@ -187,7 +189,7 @@ public class GameStatus : MonoBehaviour
         }
     }
 
-    public static int GetPassedLevelsCount()
+    public int GetPassedLevelsCount()
     {
         int count = 0;
         foreach (bool level in IsLevelPassed)
@@ -197,11 +199,24 @@ public class GameStatus : MonoBehaviour
         return count;
     }
 
+    /// <summary>
+    /// Resets past static data as: static-float time, etc.
+    /// </summary>
+    public void ResetPastData()
+    {
+        //reset active time
+        TimeActive = 0;
+        //reset data
+        UnPause();
+        //Reset HP
+        MainHero.GetComponent<PlayerScript>().Lifes = PlayerScript.LifesMax;
+    }
+
     #endregion
 
     private void Update()
     {
-        if (isActive)
+        //if (isActive)
         {
             TimeActive += (Time.deltaTime);
         }

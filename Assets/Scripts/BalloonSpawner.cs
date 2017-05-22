@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class BalloonSpawner : MonoBehaviour
+public class BalloonSpawner : NetworkBehaviour
 {
 
     const float BalloonSpawnY = 1.2f;
@@ -9,6 +10,8 @@ public class BalloonSpawner : MonoBehaviour
     const float SpawnTime = 0.5f;
 
     public GameObject MainHero;
+    public GameStatus GameStatusPrefab;
+    public bool IsNetworkGame = true;
 
     //borders
     //are using for the max and the min X of balloon spawn
@@ -31,20 +34,31 @@ public class BalloonSpawner : MonoBehaviour
 
     IEnumerator SpawnTheBalloon()
     {
-        if (GameStatus.IsActive) //spawning the balloon if that`s true
+        if (GameStatusPrefab.IsActive) //spawning the balloon if that`s true
         {
             //load balloon for future use
             GameObject balloon = (GameObject)Resources.Load("GameObjects/balloon");
             //change the balloon's position
             balloon.transform.position = new Vector2(GetRandomPositionX(), BalloonSpawnY);
             //create the prefab
-            Instantiate(balloon);
+            if (IsNetworkGame)
+            {
+                Instantiate(balloon);
+                NetworkServer.Spawn(balloon);
+            }
+            else
+            {
+                Instantiate(balloon);
+            }
+            
         }
         //waiting some time
         yield return new WaitForSeconds(SpawnTime);
         //recursion
         StartCoroutine(SpawnTheBalloon());
     }
+
+
 
     float GetRandomPositionX()
     {

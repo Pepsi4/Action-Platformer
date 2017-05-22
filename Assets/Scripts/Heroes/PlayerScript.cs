@@ -10,6 +10,9 @@ using UnityEngine.Networking;
 
 public class PlayerScript : NetworkBehaviour
 {
+    /// <summary>
+    /// The GameStatus prefab. Needs for the server side.
+    /// </summary>
     public GameStatus GameStatusPrefab;
 
     private static int lifesMax = 3;
@@ -22,11 +25,13 @@ public class PlayerScript : NetworkBehaviour
         set { lifesMax = value; }
     }
 
-    private static int lifes = 3;
+    [SyncVar]
+    private int lifes = 3;
+
     /// <summary>
     /// Current count of hero's HP
     /// </summary>
-    public static int Lifes
+    public int Lifes
     {
         get { return lifes; }
         set { lifes = value; }
@@ -35,11 +40,11 @@ public class PlayerScript : NetworkBehaviour
     private const float MoveSpeed = 0.01f;
     private const float JumpPower = 0.017f;
 
-    private static bool isCanTakeDamage = true;
+    private bool isCanTakeDamage = false;
     /// <summary>
     /// If it's sets true, the hero can't take any damage.
     /// </summary>
-    public static bool IsCanTakeDamage
+    public bool IsCanTakeDamage
     {
         get { return isCanTakeDamage; }
         set { isCanTakeDamage = value; }
@@ -50,6 +55,12 @@ public class PlayerScript : NetworkBehaviour
     //Main hero's rigibody
     //using to move it.
     private Rigidbody2D rb;
+
+    [Command]
+    private void CmdTest()
+    {
+        Debug.Log("Client -> Server");
+    }
 
     void Update()
     {
@@ -65,10 +76,15 @@ public class PlayerScript : NetworkBehaviour
         DontDestroyOnLoad(this.gameObject);
         Debug.Log("PlayerScript start");
         rb = GetComponent<Rigidbody2D>();
+
+        //test
+        CmdTest();
+
+        //Loads scene on the server.
         CmdLoadScene();
     }
 
-    
+    #region ServerSide
 
     /// <summary>
     /// The count of current connections.
@@ -76,10 +92,15 @@ public class PlayerScript : NetworkBehaviour
     [SyncVar]
     public int Connections;
 
+    /// <summary>
+    /// The health UI. Uses as on the server side and on the client side.
+    /// </summary>
+    private GameObject[] _healthUi = new GameObject[4];
+
     [Command]
     void CmdLoadScene()
     {
-        if (Connections == 1)
+        if (NetworkManager.networkSceneName != "Level (0)")
         {
             NetworkManager.singleton.ServerChangeScene("Level (0)");
             return;
@@ -89,69 +110,135 @@ public class PlayerScript : NetworkBehaviour
         Debug.Log(Connections + " : Connections ");
     }
 
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        Debug.Log("CLIENT STARTED");
+    }
+
+    public override void OnStartLocalPlayer()
+    {
+        base.OnStartLocalPlayer();
+        Debug.Log("ON START LOCAL PLAYER");
+        //CreateLocalObjects();
+    }
+
     private void OnLevelWasLoaded(int level)
     {
         if (level == 2)
         {
-            Debug.Log("Level 2");
             CreateLocalObjects();
+            //CmdCreateGlobalObjects();
         }
     }
 
+    //[Command]
+    //public void CmdCreateGlobalObjects()
+    //{
+    //    GameObject balloon = (GameObject)Resources.Load("GameObjects/Balloon");
+    //    var enemy = (GameObject)Instantiate(balloon, new Vector2(0,0), Quaternion.identity);
+    //    NetworkServer.Spawn(enemy);
+    //}
+
+    //[Client]
+    //public void CreateBalloon(GameObject balloon)
+    //{
+    //    try
+    //    {
+    //        ClientScene.RegisterPrefab(balloon);
+    //        Instantiate(balloon);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Debug.Log("ERROR : " + ex.Message);
+    //    }
+    //}
+
+    [Client]
+    //Smells like a local player spirit
     public void CreateLocalObjects()
     {
-        //--- MainHero ---
-        //NetworkServer.Spawn(MainHero);
-
+        //--- BalloonSpawner ---
+        
+        //
+        //this.gameObject.AddComponent<BalloonSpawner>();
 
         //--- Camera ---
-        GameObject camera = (GameObject)Resources.Load("GameObjects/MainCamera");
-        camera.GetComponent<CameraScript>().MainHero = this.gameObject;
-        Instantiate(camera);
+        if (GameObject.Find("Camera") == false)
+        {
+            GameObject camera = (GameObject)Resources.Load("GameObjects/MainCamera");
+            camera.GetComponent<CameraScript>().MainHero = this.gameObject;
+            camera = Instantiate(camera);
+            camera.name = "Camera";
+        }
 
         //--- GameStatus ---
-        GameObject gameStatus = (GameObject)Resources.Load("GameObjects/GameStatus");
-        Instantiate(gameStatus);
+        GameObject gameStatusPrefab = null;
+
+        if (GameObject.Find("GameStatus") == false)
+        {
+            
+            gameStatusPrefab = Instantiate((GameObject)Resources.Load("GameObjects/GameStatus"));
+            gameStatusPrefab.GetComponent<GameStatus>().MainHero = this.gameObject;
+            gameStatusPrefab.name = "GameStatus";
+        }
 
         //--- GameScore ---
-        GameObject gameScore = (GameObject)Resources.Load("GameObjects/GameScore");
-        gameScore.GetComponent<GameScore>().GameStatusPrefab = gameStatus.GetComponent<GameStatus>();
-        Instantiate(gameScore);
+        GameObject gameScorePrefab = null;
+
+        if (GameObject.Find("GameScore") == false)
+        {
+            gameScorePrefab = (GameObject)Resources.Load("GameObjects/GameScore");
+            gameScorePrefab.GetComponent<GameScore>().GameStatusPrefab = gameStatusPrefab.GetComponent<GameStatus>();
+            gameScorePrefab = Instantiate(gameScorePrefab);
+            gameScorePrefab.name = "GameScore";
+        }
 
         //--- Canvas ---
+        if (GameObject.Find("Canvas") == false)
+        {
+            SetCanvas(gameScorePrefab, gameStatusPrefab);
+        }
+    }
+
+    private void SetCanvas(GameObject gameScore, GameObject gameStatusPrefab)
+    {
         GameObject canvas = (GameObject)Resources.Load("GameObjects/Canvas");
-        canvas.GetComponentInChildren<ScorePanelScript>().GameScorePrefab = gameScore.GetComponent<GameScore>();
-        canvas.GetComponentInChildren<ScorePanelScript>().GameStatusPrefab = gameStatus.GetComponent<GameStatus>();
-        canvas.GetComponentInChildren<UiScript>().GameStatusPrefab = gameStatus.GetComponent<GameStatus>();
+
         var canvasPrefab = Instantiate(canvas);
         canvasPrefab.name = "Canvas";
 
-        //--- Event System ---
-        //Instantiate((GameObject)Resources.Load("GameObjects/EventSystem"));
+        //Load form the resources.
+        _healthUi[1] = (GameObject)Resources.Load("GameObjects/Health (1)");
+        _healthUi[2] = (GameObject)Resources.Load("GameObjects/Health (2)");
+        _healthUi[3] = (GameObject)Resources.Load("GameObjects/Health (3)");
+        GameObject timePanel = (GameObject)Resources.Load("GameObjects/TimePanel");
+
+        //Create exemplairs.
+        _healthUi[1] = Instantiate(_healthUi[1]);
+        _healthUi[2] = Instantiate(_healthUi[2]);
+        _healthUi[3] = Instantiate(_healthUi[3]);
+        timePanel = Instantiate(timePanel);
+
+        //Change the position.
+        _healthUi[1].GetComponent<Transform>().position = new Vector2(_healthUi[1].GetComponent<Transform>().position.x, Screen.height - 50);
+        _healthUi[2].GetComponent<Transform>().position = new Vector2(_healthUi[2].GetComponent<Transform>().position.x, Screen.height - 50);
+        _healthUi[3].GetComponent<Transform>().position = new Vector2(_healthUi[3].GetComponent<Transform>().position.x, Screen.height - 50);
+        timePanel.GetComponent<Transform>().position = new Vector2(timePanel.GetComponent<Transform>().position.x, Screen.height - 100);
+
+        //Set the parent the Canvas.
+        _healthUi[1].transform.SetParent(canvasPrefab.transform);
+        _healthUi[2].transform.SetParent(canvasPrefab.transform);
+        _healthUi[3].transform.SetParent(canvasPrefab.transform);
+        timePanel.transform.SetParent(canvasPrefab.transform);
+
+        //Set needed GameStatus or GameScore to the UI`s scripts.
+        canvasPrefab.GetComponentInChildren<ScorePanelScript>().GameScorePrefab = gameScore.GetComponent<GameScore>();
+        canvasPrefab.GetComponentInChildren<ScorePanelScript>().GameStatusPrefab = gameStatusPrefab.GetComponent<GameStatus>();
+        canvasPrefab.GetComponent<UiScript>().GameStatusPrefab = gameStatusPrefab;
+        canvasPrefab.GetComponent<UiScript>().TimePanel = timePanel;
     }
-
-    //Smells like a local player spirit
-    //public override void OnStartServer()
-    //{
-    //    Debug.Log("OnStartServer");
-    //    //CreateLocalObjects();
-    //}
-
-    ////What we should to initialize for the local player. Camera, balloon spawner, etc.
-    //public void OnConnectedToServer()
-    //{
-    //    Debug.Log("OnStartLocalPlayer");
-    //    CreateLocalObjects();
-    //}
-
-    //What we should to initialize for the local player. Camera, balloon spawner, etc.
-    //public override void OnStartLocalPlayer()
-    //{
-    //    Debug.Log("OnStartLocalPlayer");
-    //    CreateLocalObjects();
-    //}
-
-
+    #endregion
 
     private void OnTriggerStay2D(Collider2D collision)
     {
@@ -270,12 +357,12 @@ public class PlayerScript : NetworkBehaviour
     private IEnumerator DestroyTheLife(int lifeNumber)
     {
         //getting the fillAmount from the lifeNumber obj
-        float fillAmount = GameObject.Find("Canvas/Health (" + lifeNumber + ")").GetComponent<Image>().fillAmount;
+        float fillAmount = _healthUi[lifeNumber].GetComponent<Image>().fillAmount;//GameObject.Find("Canvas/Health (" + lifeNumber + ")").GetComponent<Image>().fillAmount;
 
         if (fillAmount > 0) // if the fillAmount haven't min value (min value: 0; max: 1)
         {
             // -.01 fillAmount to the life obj
-            GameObject.Find("Canvas/Health (" + lifeNumber + ")").GetComponent<Image>().fillAmount -= 0.01f;
+            _healthUi[lifeNumber].GetComponent<Image>().fillAmount -= 0.01f;
             //waiting some time
             yield return new WaitForSeconds(0.01f);
             //recursion

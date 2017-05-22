@@ -2,8 +2,10 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MenuScript : MonoBehaviour {
-    
+public class MenuScript : MonoBehaviour
+{
+    //public GameStatus GameStatusPrefab;
+
 	void Start ()
 	{
 	    GameObject buttonStartTheGame =  GameObject.Find("Canvas/StartTheGame");
@@ -17,7 +19,7 @@ public class MenuScript : MonoBehaviour {
 
     void StartTheMultiplayer()
     {
-        GameStatus.IsActive = true;
+        //GameStatusPrefab.IsActive = true;
         SceneManager.LoadScene("MultiplayerMenu");
     }
 
