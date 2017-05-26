@@ -56,12 +56,6 @@ public class PlayerScript : NetworkBehaviour
     //using to move it.
     private Rigidbody2D rb;
 
-    [Command]
-    private void CmdTest()
-    {
-        Debug.Log("Client -> Server");
-    }
-
     void Update()
     {
         Debug.Log("Local " + isLocalPlayer + "isServer" + isServer);
@@ -74,14 +68,19 @@ public class PlayerScript : NetworkBehaviour
     void Start()
     {
         DontDestroyOnLoad(this.gameObject);
-        Debug.Log("PlayerScript start");
+        Debug.Log("PlayerScript started");
         rb = GetComponent<Rigidbody2D>();
 
-        //test
         CmdTest();
 
         //Loads scene on the server.
         CmdLoadScene();
+    }
+
+    [Command]
+    void CmdTest()
+    {
+        Debug.Log("FROM CLIENT TO SERVER");
     }
 
     #region ServerSide
@@ -119,15 +118,16 @@ public class PlayerScript : NetworkBehaviour
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
-        Debug.Log("ON START LOCAL PLAYER");
-        //CreateLocalObjects();
+        Debug.Log("ON START LOCAL PLAYER1");
     }
 
     private void OnLevelWasLoaded(int level)
     {
-        if (level == 2)
+        Debug.Log("Current Level : " + level);
+        if (level == 2 && isLocalPlayer)
         {
             CreateLocalObjects();
+            isCanTakeDamage = true;
             //CmdCreateGlobalObjects();
         }
     }
@@ -159,7 +159,7 @@ public class PlayerScript : NetworkBehaviour
     public void CreateLocalObjects()
     {
         //--- BalloonSpawner ---
-        
+
         //
         //this.gameObject.AddComponent<BalloonSpawner>();
 
@@ -177,7 +177,7 @@ public class PlayerScript : NetworkBehaviour
 
         if (GameObject.Find("GameStatus") == false)
         {
-            
+
             gameStatusPrefab = Instantiate((GameObject)Resources.Load("GameObjects/GameStatus"));
             gameStatusPrefab.GetComponent<GameStatus>().MainHero = this.gameObject;
             gameStatusPrefab.name = "GameStatus";
@@ -193,12 +193,12 @@ public class PlayerScript : NetworkBehaviour
             gameScorePrefab = Instantiate(gameScorePrefab);
             gameScorePrefab.name = "GameScore";
         }
-
         //--- Canvas ---
         if (GameObject.Find("Canvas") == false)
         {
             SetCanvas(gameScorePrefab, gameStatusPrefab);
         }
+        
     }
 
     private void SetCanvas(GameObject gameScore, GameObject gameStatusPrefab)
@@ -248,6 +248,7 @@ public class PlayerScript : NetworkBehaviour
             {
                 if (!IsHealthLow()) //if we have more than 0 hp
                 {
+                    Debug.Log("Dmg recived from : " + collision.gameObject.name);
                     GetTheInvul(); // Our hero is invuled for InvulTime now
                     GetDamage(); // Lose an HP.
                 }
@@ -353,6 +354,7 @@ public class PlayerScript : NetworkBehaviour
         lifes--;
         isCanTakeDamage = false;
     }
+
 
     private IEnumerator DestroyTheLife(int lifeNumber)
     {
