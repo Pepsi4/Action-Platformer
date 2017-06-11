@@ -100,7 +100,7 @@
     <Compile Include="Assets\Scripts\Ui and Menu\GameScore.cs" />
     <Compile Include="Assets\Scripts\Ui and Menu\MenuScript.cs" />
     <Compile Include="Assets\Scripts\Ui and Menu\Network\MyNetworkManager.cs" />
-    <Compile Include="Assets\Scripts\Ui and Menu\Network\PlayerNetwork.cs" />
+    <Compile Include="Assets\Scripts\Ui and Menu\Network\NetworkLogic.cs" />
     <Compile Include="Assets\Scripts\Ui and Menu\ScorePanelScript.cs" />
     <Compile Include="Assets\Scripts\Ui and Menu\SelectScene.cs" />
     <Compile Include="Assets\Scripts\Ui and Menu\TutorialScene.cs" />

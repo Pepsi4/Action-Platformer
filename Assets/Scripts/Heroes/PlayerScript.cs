@@ -71,55 +71,19 @@ public class PlayerScript : NetworkBehaviour
         Debug.Log("PlayerScript started");
         rb = GetComponent<Rigidbody2D>();
 
-        CmdTest();
-
+        NetworkLogic = GetComponent<NetworkLogic>();
         //Loads scene on the server.
-        CmdLoadScene();
+        NetworkLogic.CmdLoadScene();
     }
 
-    [Command]
-    void CmdTest()
-    {
-        Debug.Log("FROM CLIENT TO SERVER");
-    }
+    #region Server Contact Place
 
-    #region ServerSide
-
-    /// <summary>
-    /// The count of current connections.
-    /// </summary>
-    [SyncVar]
-    public int Connections;
+    NetworkLogic NetworkLogic;
 
     /// <summary>
     /// The health UI. Uses as on the server side and on the client side.
     /// </summary>
     private GameObject[] _healthUi = new GameObject[4];
-
-    [Command]
-    void CmdLoadScene()
-    {
-        if (NetworkManager.networkSceneName != "Level (0)")
-        {
-            NetworkManager.singleton.ServerChangeScene("Level (0)");
-            return;
-        }
-
-        Connections++;
-        Debug.Log(Connections + " : Connections ");
-    }
-
-    public override void OnStartClient()
-    {
-        base.OnStartClient();
-        Debug.Log("CLIENT STARTED");
-    }
-
-    public override void OnStartLocalPlayer()
-    {
-        base.OnStartLocalPlayer();
-        Debug.Log("ON START LOCAL PLAYER1");
-    }
 
     private void OnLevelWasLoaded(int level)
     {
@@ -128,31 +92,8 @@ public class PlayerScript : NetworkBehaviour
         {
             CreateLocalObjects();
             isCanTakeDamage = true;
-            //CmdCreateGlobalObjects();
         }
     }
-
-    //[Command]
-    //public void CmdCreateGlobalObjects()
-    //{
-    //    GameObject balloon = (GameObject)Resources.Load("GameObjects/Balloon");
-    //    var enemy = (GameObject)Instantiate(balloon, new Vector2(0,0), Quaternion.identity);
-    //    NetworkServer.Spawn(enemy);
-    //}
-
-    //[Client]
-    //public void CreateBalloon(GameObject balloon)
-    //{
-    //    try
-    //    {
-    //        ClientScene.RegisterPrefab(balloon);
-    //        Instantiate(balloon);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        Debug.Log("ERROR : " + ex.Message);
-    //    }
-    //}
 
     [Client]
     //Smells like a local player spirit
@@ -198,7 +139,7 @@ public class PlayerScript : NetworkBehaviour
         {
             SetCanvas(gameScorePrefab, gameStatusPrefab);
         }
-        
+
     }
 
     private void SetCanvas(GameObject gameScore, GameObject gameStatusPrefab)
@@ -352,12 +293,21 @@ public class PlayerScript : NetworkBehaviour
     {
         StartCoroutine(DestroyTheLife(lifes));
         lifes--;
+        if (IsHealthLow())
+        {
+            ShowResult(connectionToServer.connectionId);
+        }
         isCanTakeDamage = false;
     }
 
+    public void ShowResult(int connectionId)
+    {
+        NetworkLogic.CmdShowResult(this.gameObject, new Color(0, 1, 0), connectionId);
+    }
 
     private IEnumerator DestroyTheLife(int lifeNumber)
     {
+        NetworkLogic.CmdDebugLog("Destroy the Life : " + lifeNumber + " On the :" + connectionToServer.connectionId);
         //getting the fillAmount from the lifeNumber obj
         float fillAmount = _healthUi[lifeNumber].GetComponent<Image>().fillAmount;//GameObject.Find("Canvas/Health (" + lifeNumber + ")").GetComponent<Image>().fillAmount;
 
