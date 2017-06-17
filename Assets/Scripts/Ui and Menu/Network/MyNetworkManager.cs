@@ -10,9 +10,16 @@ public class MyNetworkManager : MonoBehaviour
     void Start()
     {
         DontDestroyOnLoad(GameObject.Find("Network"));
+    }
 
-        GameObject.Find("Canvas/Join").GetComponent<Button>().onClick.AddListener(Join);
-        GameObject.Find("Canvas/Host").GetComponent<Button>().onClick.AddListener(Host);
+    private void OnLevelWasLoaded(int level)
+    {
+        try
+        {
+            GameObject.Find("Canvas/Join").GetComponent<Button>().onClick.AddListener(Join);
+            GameObject.Find("Canvas/Host").GetComponent<Button>().onClick.AddListener(Host);
+        }
+        catch { }
     }
 
     private void Join()

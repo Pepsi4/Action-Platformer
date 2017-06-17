@@ -23,7 +23,7 @@ public class GameStatus : MonoBehaviour
         get { return isTutorialNow; }
         set { isTutorialNow = value; }
     }
-    
+
     /// <summary>
     /// The current value of level's count.
     /// </summary>
@@ -45,12 +45,12 @@ public class GameStatus : MonoBehaviour
     /// how long the level is playing
     /// </summary>
     public float TimeActive { get; set; }
-    
+
     /// <summary>
     /// The current level.
     /// </summary>
     public int CurrentLevel
-    { 
+    {
         get { return currentLevel; }
         set { currentLevel = value; }
     }
@@ -62,14 +62,22 @@ public class GameStatus : MonoBehaviour
     public bool[] IsLevelPassed = new bool[levelsCount];
 
     public GameObject MainHero;
-    
+
     private bool isActive = true;
     private int currentLevel = 0;
     private bool isTutorialNow = false;
     #endregion
 
     #region public methods
-    
+
+    public static void Create(bool isMultiplayer)
+    {
+        GameObject gameStatus = Instantiate((GameObject)Resources.Load("GameObjects/GameStatus"));
+        gameStatus.name = "GameStatus";
+        gameStatus.GetComponent<GameStatus>().IsMultiplayerNow = isMultiplayer;
+        DontDestroyOnLoad(gameStatus);
+    }
+
     //We have to pause the game sometimes.
     //For ex: the level finished by player.
     /// <summary>
@@ -88,7 +96,7 @@ public class GameStatus : MonoBehaviour
         //show the stars
         GameObject.Find("Canvas/ScorePanel").GetComponent<ScorePanelScript>().ShowStar();
     }
-    
+
     /// <summary>
     /// Pauses the game but the score panel is not showing.
     /// </summary>
@@ -101,7 +109,7 @@ public class GameStatus : MonoBehaviour
             //starts the animation
             GameObject.Find("Canvas/ScorePanel").GetComponent<Animator>().Play("ScorePanel");
             //updating text
-            GameObject.Find("Canvas/ScorePanel/ScoreText").GetComponent<Text>().text = "Your time: " +  TimeActive.ToString("0.##");
+            GameObject.Find("Canvas/ScorePanel/ScoreText").GetComponent<Text>().text = "Your time: " + TimeActive.ToString("0.##");
 
             //pause the game
             Pause();
@@ -136,7 +144,6 @@ public class GameStatus : MonoBehaviour
     /// </summary>
     public void UnPause()
     {
-
         //sets game as active again
         IsActive = true;
 
@@ -204,12 +211,19 @@ public class GameStatus : MonoBehaviour
     /// </summary>
     public void ResetPastData()
     {
-        //reset active time
-        TimeActive = 0;
-        //reset data
-        UnPause();
-        //Reset HP
-        MainHero.GetComponent<PlayerScript>().Lifes = PlayerScript.LifesMax;
+        try
+        {
+            //reset active time
+            TimeActive = 0;
+            //reset data
+            UnPause();
+            //Reset HP
+            MainHero.GetComponent<PlayerScript>().Lifes = PlayerScript.LifesMax;
+        }
+        catch (UnassignedReferenceException)
+        {
+            Debug.Log("Main Hero is not exists yet.");
+        }
     }
 
     #endregion

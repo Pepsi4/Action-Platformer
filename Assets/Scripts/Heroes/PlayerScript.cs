@@ -118,10 +118,13 @@ public class PlayerScript : NetworkBehaviour
 
         if (GameObject.Find("GameStatus") == false)
         {
-
-            gameStatusPrefab = Instantiate((GameObject)Resources.Load("GameObjects/GameStatus"));
+            gameStatusPrefab = Instantiate((GameObject) Resources.Load("GameObjects/GameStatus"));
             gameStatusPrefab.GetComponent<GameStatus>().MainHero = this.gameObject;
             gameStatusPrefab.name = "GameStatus";
+        }
+        else // If the GameStatus is exists.
+        {
+            gameStatusPrefab = GameObject.Find("GameStatus");
         }
 
         //--- GameScore ---
@@ -129,17 +132,21 @@ public class PlayerScript : NetworkBehaviour
 
         if (GameObject.Find("GameScore") == false)
         {
-            gameScorePrefab = (GameObject)Resources.Load("GameObjects/GameScore");
+            gameScorePrefab = (GameObject) Resources.Load("GameObjects/GameScore");
             gameScorePrefab.GetComponent<GameScore>().GameStatusPrefab = gameStatusPrefab.GetComponent<GameStatus>();
             gameScorePrefab = Instantiate(gameScorePrefab);
             gameScorePrefab.name = "GameScore";
         }
+        else // IF the GameScore exists.
+        {
+            gameScorePrefab = GameObject.Find("GameScore");
+        }
+
         //--- Canvas ---
         if (GameObject.Find("Canvas") == false)
         {
             SetCanvas(gameScorePrefab, gameStatusPrefab);
         }
-
     }
 
     private void SetCanvas(GameObject gameScore, GameObject gameStatusPrefab)
@@ -174,6 +181,8 @@ public class PlayerScript : NetworkBehaviour
         timePanel.transform.SetParent(canvasPrefab.transform);
 
         //Set needed GameStatus or GameScore to the UI`s scripts.
+        Debug.Log(gameScore);
+
         canvasPrefab.GetComponentInChildren<ScorePanelScript>().GameScorePrefab = gameScore.GetComponent<GameScore>();
         canvasPrefab.GetComponentInChildren<ScorePanelScript>().GameStatusPrefab = gameStatusPrefab.GetComponent<GameStatus>();
         canvasPrefab.GetComponent<UiScript>().GameStatusPrefab = gameStatusPrefab;

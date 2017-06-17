@@ -1,5 +1,6 @@
 ﻿using UnityEngine.UI;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
 public class SelectScene : MonoBehaviour
@@ -24,6 +25,23 @@ public class SelectScene : MonoBehaviour
         //here will be diference in 1 point.
         //ex: button[0] = first level button.
 
+        GameStatusPrefab = GameObject.Find("GameStatus").GetComponent<GameStatus>();
+        GameScorePrefab = GameObject.Find("GameScore").GetComponent<GameScore>();
+
+        InitStars();
+
+        //exit button
+        exitButton = GameObject.Find("Canvas/Exit");
+        exitButton.GetComponent<Button>().onClick.AddListener(Exit);
+
+        //open level if the player unlocked it before.
+        OpenLevels();
+        //opens small stars if it's avaible
+        CheckStars();
+    }
+
+    private void InitStars()
+    {
         //Initialization the each button in array.
         for (int x = 0; x < button.Length; x++)
         {
@@ -53,17 +71,6 @@ public class SelectScene : MonoBehaviour
             LoadTutorial();
             GameStatusPrefab.ResetPastData();
         });
-
-        //exit button
-        exitButton = GameObject.Find("Canvas/Exit");
-        exitButton.GetComponent<Button>().onClick.AddListener(Exit);
-
-
-
-        //open level if the player unlocked it before.
-        OpenLevels();
-        //opens small stars if it's avaible
-        CheckStars();
     }
 
     #region Small stars
@@ -90,8 +97,6 @@ public class SelectScene : MonoBehaviour
         }
     }
 
-
-
     private void CheckStars()
     {
         DeclareStars();
@@ -104,7 +109,7 @@ public class SelectScene : MonoBehaviour
         bestResult = GameScorePrefab.thirdLevel.bestResult;
         ChangeStarColor(bestResult, 2);
     }
-    //ERROR
+
     private void ChangeStarColor(int starCounter, int level)
     {
         for (int x = level * 3; x < starCounter + level * 3; x++)
@@ -120,6 +125,10 @@ public class SelectScene : MonoBehaviour
         SceneManager.LoadScene("Level (" + level + ")");
         //level++
         GameStatusPrefab.CurrentLevel = level;
+        
+        //Network.
+        //NetworkManager.singleton.networkPort = 888;
+        NetworkManager.singleton.StartHost();
     }
 
     private void LoadTutorial()

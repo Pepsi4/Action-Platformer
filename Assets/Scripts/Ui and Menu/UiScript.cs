@@ -13,6 +13,13 @@ public class UiScript : MonoBehaviour
 
     void UpdateTimer()
     {
-        TimePanel.GetComponentInChildren<Text>().text = GameStatusPrefab.GetComponent<GameStatus>().TimeActive.ToString("0.##");
+        try
+        {
+            TimePanel.GetComponentInChildren<Text>().text = GameStatusPrefab.GetComponent<GameStatus>().TimeActive.ToString("0.##");
+        }
+        catch (UnassignedReferenceException)
+        {
+            Debug.Log("Time panel is not exists yet.");
+        }
     }
 }

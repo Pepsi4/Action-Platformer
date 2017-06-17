@@ -7,9 +7,16 @@ public class GameScore : MonoBehaviour
 {
     public GameStatus GameStatusPrefab;
 
-    public FirstLevel firstLevel;
-    public SecondLevel secondLevel;
-    public ThirdLevel thirdLevel;
+    public FirstLevel firstLevel = new FirstLevel();
+    public SecondLevel secondLevel = new SecondLevel();
+    public ThirdLevel thirdLevel = new ThirdLevel();
+
+    public static void Create()
+    {
+        GameObject gameScore = Instantiate((GameObject)Resources.Load("GameObjects/GameScore"));
+        gameScore.name = "GameScore";
+        DontDestroyOnLoad(gameScore);
+    }
 
     //first level info
     public class FirstLevel
@@ -17,12 +24,12 @@ public class GameScore : MonoBehaviour
         internal const float HightScore = 7f;
         internal const float MiddleScore = 11f;
         internal const float LowScore = 15f;
-        
+
         public int bestResult = 0;
     }
 
     //second level info
-    public  class SecondLevel
+    public class SecondLevel
     {
         internal const float HightScore = 5f;
         internal const float MiddleScore = 7f;
@@ -31,7 +38,7 @@ public class GameScore : MonoBehaviour
         public int bestResult = 0;
     }
 
-    public  class ThirdLevel
+    public class ThirdLevel
     {
         internal const float HightScore = 5f;
         internal const float MiddleScore = 7f;
