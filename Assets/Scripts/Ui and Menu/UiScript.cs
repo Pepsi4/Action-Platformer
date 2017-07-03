@@ -1,10 +1,11 @@
 ﻿using UnityEngine.UI;
 using UnityEngine;
 
-public class UiScript : MonoBehaviour
+public class UiScript : MonoBehaviour //todo: rename
 {
     public GameObject GameStatusPrefab;
     public GameObject TimePanel;
+    public GameObject MainHero;
 
     void Update()
     {
@@ -13,13 +14,17 @@ public class UiScript : MonoBehaviour
 
     void UpdateTimer()
     {
-        try
+        if (MainHero.GetComponent<PlayerScript>().IsTimerRecordable)
         {
-            TimePanel.GetComponentInChildren<Text>().text = GameStatusPrefab.GetComponent<GameStatus>().TimeActive.ToString("0.##");
-        }
-        catch (UnassignedReferenceException)
-        {
-            Debug.Log("Time panel is not exists yet.");
+            try
+            {
+                // Updates time on UI.
+                TimePanel.GetComponentInChildren<Text>().text = GameStatusPrefab.GetComponent<GameStatus>().TimeActive.ToString("0.##");
+            }
+            catch (UnassignedReferenceException)
+            {
+                Debug.Log("Time panel is not exists yet.");
+            }
         }
     }
 }

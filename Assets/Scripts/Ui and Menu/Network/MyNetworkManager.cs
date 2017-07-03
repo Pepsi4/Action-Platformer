@@ -1,11 +1,32 @@
 ﻿using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Networking.NetworkSystem;
+
+public class Msg
+{
+    public const short LoginClient = 100;
+    public const short StartGame = 101;
+}
+
+public class OnReady : MessageBase
+{
+    public string Name;
+
+    public OnReady()
+    {
+    }
+}
 
 public class MyNetworkManager : MonoBehaviour
 {
     public string IpAddress;
     public string Port;
+
+    private void OnReady(NetworkMessage netMsg)
+    {
+        Debug.Log("OnReady");
+    }
 
     void Start()
     {
@@ -31,6 +52,8 @@ public class MyNetworkManager : MonoBehaviour
         NetworkManager.singleton.networkAddress = IpAddress;
         NetworkManager.singleton.networkPort = int.Parse(Port);
         NetworkClient client = NetworkManager.singleton.StartClient();
+
+        client.RegisterHandler(Msg.StartGame, OnReady);
     }
 
     private void Host()
@@ -41,5 +64,7 @@ public class MyNetworkManager : MonoBehaviour
         NetworkManager.singleton.networkAddress = IpAddress;
         NetworkManager.singleton.networkPort = int.Parse(Port);
         NetworkClient client = NetworkManager.singleton.StartHost();
+
+        NetworkServer.RegisterHandler(Msg.StartGame, OnReady);
     }
 }

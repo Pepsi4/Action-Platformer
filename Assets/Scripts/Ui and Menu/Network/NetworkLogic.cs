@@ -1,6 +1,7 @@
 ﻿using UnityEngine.Networking;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class NetworkLogic : NetworkBehaviour {
 
@@ -21,6 +22,22 @@ public class NetworkLogic : NetworkBehaviour {
         //Makes the UI visible.
         GameObject.Find("Canvas/MultiplayerEndUi/Panel").GetComponent<Image>().enabled = true;
         GameObject.Find("Canvas/MultiplayerEndUi/Panel/Text").GetComponent<Text>().enabled = true;
+        GameObject.Find("Canvas/MultiplayerEndUi/Panel/Exit").GetComponent<Image>().enabled = true;
+        GameObject.Find("Canvas/MultiplayerEndUi/Panel/Exit/Text").GetComponent<Text>().enabled = true;
+
+        //Adds EventSystem.
+        if (GameObject.Find("EventSystem") == false)
+        {
+            GameObject eventSytem = Instantiate((GameObject)Resources.Load("GameObjects/EventSystem"));
+            eventSytem.name = "EventSystem";
+        }
+
+        //Adds to the button delegate.
+        GameObject.Find("Canvas/MultiplayerEndUi/Panel/Exit").GetComponent<Button>().onClick.AddListener(delegate
+        {
+            Debug.Log("Exit Button Pressed");
+            SceneManager.LoadScene("WaitingRoom");
+        });
 
         //Changes the text of the finall UI.
         if (connectionToServer.connectionId == connectionId)
@@ -40,11 +57,11 @@ public class NetworkLogic : NetworkBehaviour {
     }
 
     [Command]
-    public void CmdLoadScene()
+    public void CmdLoadScene(string levelName)
     {
-        if (NetworkManager.networkSceneName != "Level (0)")
+        if (NetworkManager.networkSceneName != levelName)
         {
-            NetworkManager.singleton.ServerChangeScene("Level (0)");
+            NetworkManager.singleton.ServerChangeScene(levelName);
         }
     }
 }

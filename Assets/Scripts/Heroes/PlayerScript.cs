@@ -6,6 +6,7 @@ using System.Collections;
 using UnityEngine.UI;
 using System;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 
 public class PlayerScript : NetworkBehaviour
@@ -14,6 +15,8 @@ public class PlayerScript : NetworkBehaviour
     /// The GameStatus prefab. Needs for the server side.
     /// </summary>
     public GameStatus GameStatusPrefab;
+
+    public bool IsTimerRecordable = false;
 
     private static int lifesMax = 3;
     /// <summary>
@@ -72,8 +75,9 @@ public class PlayerScript : NetworkBehaviour
         rb = GetComponent<Rigidbody2D>();
 
         NetworkLogic = GetComponent<NetworkLogic>();
+
         //Loads scene on the server.
-        NetworkLogic.CmdLoadScene();
+        NetworkLogic.CmdLoadScene("WaitingRoom");
     }
 
     #region Server Contact Place
@@ -88,10 +92,29 @@ public class PlayerScript : NetworkBehaviour
     private void OnLevelWasLoaded(int level)
     {
         Debug.Log("Current Level : " + level);
-        if (level == 2 && isLocalPlayer)
+        if (isLocalPlayer)
         {
-            CreateLocalObjects();
-            isCanTakeDamage = true;
+            if (SceneManager.GetActiveScene().name == "WaitingRoom")
+            {
+                CreateLocalObjects();
+                isCanTakeDamage = false;
+
+                // Spawns the Waiting Room Obj. 
+                //Which will help us to get know when all players will be ready.
+                GameObject waitingRoomPrefab = (GameObject)Instantiate((GameObject) Resources.Load("Gameobjects/WaitingRoomObj"));
+                ClientScene.RegisterPrefab(waitingRoomPrefab);
+                NetworkServer.Spawn(waitingRoomPrefab);
+
+                //
+                if (isServer)
+                {
+                    Instantiate((GameObject)Resources.Load("GameObjects/ServerInfo"));
+                }
+            }
+            else
+            {
+                isCanTakeDamage = true;
+            }
         }
     }
 
@@ -100,9 +123,6 @@ public class PlayerScript : NetworkBehaviour
     public void CreateLocalObjects()
     {
         //--- BalloonSpawner ---
-
-        //
-        //this.gameObject.AddComponent<BalloonSpawner>();
 
         //--- Camera ---
         if (GameObject.Find("Camera") == false)
@@ -118,7 +138,7 @@ public class PlayerScript : NetworkBehaviour
 
         if (GameObject.Find("GameStatus") == false)
         {
-            gameStatusPrefab = Instantiate((GameObject) Resources.Load("GameObjects/GameStatus"));
+            gameStatusPrefab = Instantiate((GameObject)Resources.Load("GameObjects/GameStatus"));
             gameStatusPrefab.GetComponent<GameStatus>().MainHero = this.gameObject;
             gameStatusPrefab.name = "GameStatus";
         }
@@ -132,7 +152,7 @@ public class PlayerScript : NetworkBehaviour
 
         if (GameObject.Find("GameScore") == false)
         {
-            gameScorePrefab = (GameObject) Resources.Load("GameObjects/GameScore");
+            gameScorePrefab = (GameObject)Resources.Load("GameObjects/GameScore");
             gameScorePrefab.GetComponent<GameScore>().GameStatusPrefab = gameStatusPrefab.GetComponent<GameStatus>();
             gameScorePrefab = Instantiate(gameScorePrefab);
             gameScorePrefab.name = "GameScore";
@@ -181,12 +201,11 @@ public class PlayerScript : NetworkBehaviour
         timePanel.transform.SetParent(canvasPrefab.transform);
 
         //Set needed GameStatus or GameScore to the UI`s scripts.
-        Debug.Log(gameScore);
-
         canvasPrefab.GetComponentInChildren<ScorePanelScript>().GameScorePrefab = gameScore.GetComponent<GameScore>();
         canvasPrefab.GetComponentInChildren<ScorePanelScript>().GameStatusPrefab = gameStatusPrefab.GetComponent<GameStatus>();
         canvasPrefab.GetComponent<UiScript>().GameStatusPrefab = gameStatusPrefab;
         canvasPrefab.GetComponent<UiScript>().TimePanel = timePanel;
+        canvasPrefab.GetComponent<UiScript>().MainHero = this.gameObject;
     }
     #endregion
 
