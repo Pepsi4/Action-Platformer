@@ -20,12 +20,21 @@ public class OnReady : MessageBase
 
 public class MyNetworkManager : MonoBehaviour
 {
+    public WaitingRoomScript WaitingRoomScript;
+
     public string IpAddress;
     public string Port;
 
     private void OnReady(NetworkMessage netMsg)
     {
-        Debug.Log("OnReady");
+        OnOnReady(netMsg);
+    }
+
+    private void OnOnReady(NetworkMessage netMsg)
+    {
+        var readyCount = netMsg.ReadMessage<IntegerMessage>();
+        WaitingRoomScript.ReadyCount = readyCount.value;
+        //WaitingRoomScript.IsReady = true;
     }
 
     void Start()

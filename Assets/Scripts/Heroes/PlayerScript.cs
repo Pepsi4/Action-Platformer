@@ -105,11 +105,9 @@ public class PlayerScript : NetworkBehaviour
                 ClientScene.RegisterPrefab(waitingRoomPrefab);
                 NetworkServer.Spawn(waitingRoomPrefab);
 
+                
+
                 //
-                if (isServer)
-                {
-                    Instantiate((GameObject)Resources.Load("GameObjects/ServerInfo"));
-                }
             }
             else
             {
