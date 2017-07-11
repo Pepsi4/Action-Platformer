@@ -10,15 +10,24 @@ public class NetworkLogic : NetworkBehaviour {
     {
         NetworkIdentity objNetId = obj.GetComponent<NetworkIdentity>();
         objNetId.AssignClientAuthority(connectionToClient);
-        RpcShowResult(obj, col, connectionId);
+    }
+
+    [Command]
+    public void CmdChangeColor(GameObject obj, Color col)
+    {
+        RpcChangeColor(obj, col);
     }
 
     [ClientRpc]
-    public void RpcShowResult(GameObject obj, Color col, int connectionId)
+    public void RpcChangeColor(GameObject obj, Color col)
     {
-        //Changes the color too.
+        //Changes the color.
         obj.GetComponent<SpriteRenderer>().color = col;
+    }
 
+    [ClientRpc]
+    public void RpcShowResult(GameObject obj, int connectionId)
+    {
         //Makes the UI visible.
         GameObject.Find("Canvas/MultiplayerEndUi/Panel").GetComponent<Image>().enabled = true;
         GameObject.Find("Canvas/MultiplayerEndUi/Panel/Text").GetComponent<Text>().enabled = true;

@@ -14,7 +14,7 @@ public class PlayerScript : NetworkBehaviour
     /// <summary>
     /// The GameStatus prefab. Needs for the server side.
     /// </summary>
-    public GameStatus GameStatusPrefab;
+    public GameObject GameStatusPrefab;
 
     public bool IsTimerRecordable = false;
 
@@ -68,9 +68,13 @@ public class PlayerScript : NetworkBehaviour
         }
     }
 
-    void Start()
+    private void Awake()
     {
         DontDestroyOnLoad(this.gameObject);
+    }
+
+    void Start()
+    {
         Debug.Log("PlayerScript started");
         rb = GetComponent<Rigidbody2D>();
 
@@ -92,6 +96,7 @@ public class PlayerScript : NetworkBehaviour
     private void OnLevelWasLoaded(int level)
     {
         Debug.Log("Current Level : " + level);
+
         if (isLocalPlayer)
         {
             if (SceneManager.GetActiveScene().name == "WaitingRoom")
@@ -101,17 +106,18 @@ public class PlayerScript : NetworkBehaviour
 
                 // Spawns the Waiting Room Obj. 
                 //Which will help us to get know when all players will be ready.
-                GameObject waitingRoomPrefab = (GameObject)Instantiate((GameObject) Resources.Load("Gameobjects/WaitingRoomObj"));
-                ClientScene.RegisterPrefab(waitingRoomPrefab);
-                NetworkServer.Spawn(waitingRoomPrefab);
+                GameObject waitingRoomPrefab = (GameObject)Resources.Load("Gameobjects/WaitingRoomObj");
+                Instantiate(waitingRoomPrefab);
 
-                
-
-                //
+                //ClientScene.RegisterPrefab(waitingRoomPrefab);
+                //NetworkServer.Spawn(waitingRoomPrefab);
             }
-            else
+            else if (level == 2)
             {
+                CreateLocalObjects();
+                IsTimerRecordable = true;
                 isCanTakeDamage = true;
+                GameStatusPrefab.GetComponent<GameStatus>().IsActive = true;
             }
         }
     }
@@ -132,17 +138,17 @@ public class PlayerScript : NetworkBehaviour
         }
 
         //--- GameStatus ---
-        GameObject gameStatusPrefab = null;
 
         if (GameObject.Find("GameStatus") == false)
         {
-            gameStatusPrefab = Instantiate((GameObject)Resources.Load("GameObjects/GameStatus"));
-            gameStatusPrefab.GetComponent<GameStatus>().MainHero = this.gameObject;
-            gameStatusPrefab.name = "GameStatus";
+            Debug.Log("GameStatus is creating");
+            GameStatusPrefab = Instantiate((GameObject)Resources.Load("GameObjects/GameStatus"));
+            GameStatusPrefab.GetComponent<GameStatus>().MainHero = this.gameObject;
+            GameStatusPrefab.name = "GameStatus";
         }
         else // If the GameStatus is exists.
         {
-            gameStatusPrefab = GameObject.Find("GameStatus");
+            GameStatusPrefab = GameObject.Find("GameStatus");
         }
 
         //--- GameScore ---
@@ -151,7 +157,7 @@ public class PlayerScript : NetworkBehaviour
         if (GameObject.Find("GameScore") == false)
         {
             gameScorePrefab = (GameObject)Resources.Load("GameObjects/GameScore");
-            gameScorePrefab.GetComponent<GameScore>().GameStatusPrefab = gameStatusPrefab.GetComponent<GameStatus>();
+            gameScorePrefab.GetComponent<GameScore>().GameStatusPrefab = GameStatusPrefab.GetComponent<GameStatus>();
             gameScorePrefab = Instantiate(gameScorePrefab);
             gameScorePrefab.name = "GameScore";
         }
@@ -163,7 +169,7 @@ public class PlayerScript : NetworkBehaviour
         //--- Canvas ---
         if (GameObject.Find("Canvas") == false)
         {
-            SetCanvas(gameScorePrefab, gameStatusPrefab);
+            SetCanvas(gameScorePrefab, GameStatusPrefab);
         }
     }
 
@@ -236,7 +242,7 @@ public class PlayerScript : NetworkBehaviour
     private void EndTheGame()
     {
         Debug.Log("Low HP");
-        GameStatusPrefab.StopTheGame(true);
+        GameStatusPrefab.GetComponent<GameStatus>().StopTheGame(true);
     }
 
     private bool IsHealthLow()

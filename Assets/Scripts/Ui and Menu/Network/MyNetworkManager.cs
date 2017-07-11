@@ -24,17 +24,13 @@ public class MyNetworkManager : MonoBehaviour
 
     public string IpAddress;
     public string Port;
+    public NetworkClient PlayerClient;
 
     private void OnReady(NetworkMessage netMsg)
     {
-        OnOnReady(netMsg);
-    }
-
-    private void OnOnReady(NetworkMessage netMsg)
-    {
+        Debug.Log("OnReady");
         var readyCount = netMsg.ReadMessage<IntegerMessage>();
         WaitingRoomScript.ReadyCount = readyCount.value;
-        //WaitingRoomScript.IsReady = true;
     }
 
     void Start()
@@ -60,9 +56,9 @@ public class MyNetworkManager : MonoBehaviour
 
         NetworkManager.singleton.networkAddress = IpAddress;
         NetworkManager.singleton.networkPort = int.Parse(Port);
-        NetworkClient client = NetworkManager.singleton.StartClient();
+        PlayerClient = NetworkManager.singleton.StartClient();
 
-        client.RegisterHandler(Msg.StartGame, OnReady);
+        PlayerClient.RegisterHandler(Msg.StartGame, OnReady);
     }
 
     private void Host()
