@@ -1,4 +1,4 @@
-# Multiplayer-Action-Platformer (Unity/c#)
+Action-Platformer (Unity/c#)
 
 Here you can find the src of my game. Game looks like a small platformer :) . I'm working on the multiplayer now, it's working but not so good.
 
